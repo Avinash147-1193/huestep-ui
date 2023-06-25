@@ -1,6 +1,8 @@
 export const SET_AUTH_USER = 'SET_AUTH_USER'
 export const SET_AUTH_USER_PROFILE = 'SET_AUTH_USER_PROFILE'
 export const SET_AUTH_USER_POST = 'SET_AUTH_USER_POST'
+export const SET_AUTH_USER_LIKED_POSTS = 'SET_AUTH_USER_LIKED_POSTS'
+
 
 export const setAuthUser = (user) => dispatch => {
     dispatch({
@@ -20,5 +22,12 @@ export const setAuthUserPost = (user_post) => dispatch => {
     dispatch({
         type: SET_AUTH_USER_POST,
         payload: user_post,
+    })
+};
+
+export const setAuthUserLikedPost = (user_liked_posts) => dispatch => {
+    dispatch({
+        type: SET_AUTH_USER_LIKED_POSTS,
+        payload: user_liked_posts,
     })
 };

@@ -1,38 +1,82 @@
+import  React, {useState, useEffect} from 'react'
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
-import React from 'react'
 import { Divider } from 'react-native-elements'
 import { GlobalColors } from '../../constants/GlobalColors'
+import { API } from '../../constants/GlobalAPI'
 import { POSTS } from '../../data/Posts'
+import axios from 'axios';
+import { useSelector, useDispatch } from 'react-redux';
+import { setAuthUserProfile, setAuthUserPost, setAuthUserLikedPost } from '../../redux/actions';
+
+const SERVER_STATE = API.CURRENT_STATE;
 
 const postFooterIcons = [
   {
     name: 'Like',
-    imageUrl: 'https://img.icons8.com/ios/50/ffffff/like--v1.png',
-    likedImageUrl: 'https://img.icons8.com/color/48/null/hearts.png'
+    imageUrl: 'https://img.icons8.com/ios/50/000000/facebook-like--v1.png',
+    likedImageUrl: 'https://img.icons8.com/ios-filled/50/facebook-like.png'
   },
   {
     name: 'Comment',
-    imageUrl: 'https://img.icons8.com/external-flatart-icons-outline-flatarticons/64/FFFFFF/external-comment-chat-flatart-icons-outline-flatarticons-1.png'
+    imageUrl: 'https://img.icons8.com/ios/50/comments--v1.png'
   },
   {
     name: 'Share',
-    imageUrl: 'https://img.icons8.com/ios/50/FFFFFF/paper-plane--v1.png'
+    imageUrl: 'https://img.icons8.com/ios/50/right2.png'
   },
   {
     name: 'Save',
-    imageUrl: 'https://img.icons8.com/external-anggara-basic-outline-anggara-putra/24/FFFFFF/external-bookmark-social-media-interface-anggara-basic-outline-anggara-putra-2.png'
+    imageUrl: 'https://img.icons8.com/ios/50/add-bookmark.png'
   }
 ]
 
+
+
 const Post = ({post}) => {
-  console.log(post)
+  const [like, setLike] = useState('');
+  const [likesCount, setLikesCount] = useState('');
+  const { user_liked_posts, user } = useSelector(state => state.userReducer);
+  //const dispatch = useDispatch();
+
+
+  useEffect(() => {
+    setLikesCount(post.fields.likes)
+    if (user_liked_posts.indexOf(post.pk) >= 0) {
+      setLike(1);
+      console.log('----usereffect if----', post.fields.likes,'--------likes---',post.fields.likes,'---------post.pk----',post.pk,'------user_liked_posts----', user_liked_posts)
+    } else {
+      setLike(0);
+    }
+
+  }, [user_liked_posts, post.pk]);
+
+  const HandleLike =  (post, user_liked_posts) => {
+    let updatedLikedPosts = []
+
+    like == 0 ? setLikesCount(likesCount + 1 ) : setLikesCount(likesCount - 1 )
+    setLike(!like);
+
+    try {
+      let baseUrl = API[SERVER_STATE] + API.USER.postLike;
+       console.log(baseUrl, '---username1--', user.user_id, '---token----',user.token);
+      const response = axios.post(baseUrl, {
+          username: user.user_id,
+          token: user.token,
+          post: {post_id: post.pk}
+      });
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  
   return (
     <View style={{marginBottom: 30}}>
       <PostHeader post={post} />
       <PostImage post={post} />
       <View style={{marginHorizontal: 15, marginTop: 10}}>
-        <PostFooter />
-        <Likes post={post}/>
+        <PostFooter post={post} user_liked_posts={user_liked_posts} HandleLike={HandleLike} like={like}/>
+        <Likes post={post} likesCount={likesCount}/>
         <Caption post={post} />
         <CommentSection post={post} />
         <Comments post={post} />
@@ -41,6 +85,8 @@ const Post = ({post}) => {
     </View>
   )
 }
+
+
 
 const PostHeader = ({post}) => (
   <View
@@ -52,8 +98,8 @@ const PostHeader = ({post}) => (
     }}
   >
     <View style={{flexDirection: 'row', alignItems: 'center'}}>
-      <Image source={{uri: post.profile_picture}} style={styles.story}/>
-      <Text style={{color: GlobalColors.text.postText, marginLeft:5, fontWeight: '700'}}>{post.username}</Text>
+      <Image source={{uri: post.fields.profile_picture}} style={styles.story}/>
+      <Text style={{color: GlobalColors.text.postText, marginLeft:5, fontWeight: '700'}}>{post.fields.username}</Text>
     </View>
     <TouchableOpacity>
       <Text style={{color:  GlobalColors.text.postText, fontWeight: '900'}}>...</Text>
@@ -66,16 +112,17 @@ const PostImage = ({post}) => (
     width: '100%',
     height: 450,
   }}>
-    <Image source={{uri: post.post_images}} style={{ height: '100%', resizeMode: 'cover'}} />
+    <Image source={{uri: post.fields.post_images}} style={{ height: '100%', resizeMode: 'cover'}} />
   </View>
 )
 
-const PostFooter = ( ) => (
+const PostFooter = ( {post, user_liked_posts, HandleLike, like} ) => (
+
   <View style={{flexDirection: 'row',}}>
     <View style={styles.leftFooterIconsContainer}>
-      <Icon imageStyle={styles.footerIcon} imgUrl={postFooterIcons[0].imageUrl} />
-      <Icon imageStyle={styles.footerIcon} imgUrl={postFooterIcons[1].imageUrl} />
-      <Icon imageStyle={styles.footerIcon} imgUrl={postFooterIcons[2].imageUrl} />
+      <Icon imageStyle={styles.footerIcon} onPress={() => HandleLike(post, user_liked_posts)} imgUrl={ like == 1 ? postFooterIcons[0].likedImageUrl : postFooterIcons[0].imageUrl} />
+      <Icon imageStyle={styles.footerIcon} onPress={() => console.log('-------comment-------')} imgUrl={postFooterIcons[1].imageUrl} />
+      <Icon imageStyle={styles.footerIcon} onPress={() => console.log('-------share-------')} imgUrl={postFooterIcons[2].imageUrl} />
     </View>
     <View style={{flex:1, alignItems:'flex-end'}}>
       <Icon imageStyle={styles.footerIcon} imgUrl={postFooterIcons[3].imageUrl} />
@@ -84,15 +131,15 @@ const PostFooter = ( ) => (
   
 )
 
-const Icon = ({imageStyle, imgUrl}) => (
-  <TouchableOpacity>
+const Icon = ({imageStyle, imgUrl, onPress}) => (
+  <TouchableOpacity onPress={onPress}>
     <Image style={imageStyle} source={{uri: imgUrl}} />
   </TouchableOpacity>
 )
 
-const Likes = ({post}) => (
+const Likes = ({post, likesCount}) => (
   <View style={{flexDirection: 'row', marginTop: 4}}>
-    <Text style={{color:  GlobalColors.text.postText, fontWeight: '600'}}>{post.likes.toLocaleString('en')} likes</Text>
+    <Text style={{color:  GlobalColors.text.postText, fontWeight: '600'}} >{likesCount} likes</Text>
   </View>
 )
 
@@ -100,17 +147,17 @@ const Caption = ({post}) => (
   <View style={{marginTop:5}}>
     <Text style={{color:  GlobalColors.text.postText}}>
       <Text style={{fontWeight: 600}}>{POSTS[0].user}</Text>
-      <Text> {post.text}</Text>
+      <Text> {post.fields.text}</Text>
     </Text>
   </View>
 )
 
 const CommentSection = ({post}) => (
   <View style={{marginTop: 5}}>
-    {!!post.comments.length && (
+    {!!post.fields.comments.length && (
       <Text style={{color:GlobalColors.text.postText}}>
-        View{post.comments.length > 1 ? ' all' : ''} {post.comments.length}
-        {post.comments.length > 1 ? ' comments' : ' comment'}
+        View{post.fields.comments.length > 1 ? ' all' : ''} {post.fields.comments.length}
+        {post.fields.comments.length > 1 ? ' comments' : ' comment'}
       </Text>
     )}
   </View>

@@ -1,31 +1,30 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, Image, TouchableOpacity, Platform } from "react-native";
 import React, { useState } from "react";
 import { Divider } from "react-native-elements";
 import { GlobalColors } from "../../constants/GlobalColors";
 
+const height = Platform.OS === 'android' ? 50 : 65;
+
 export const bottomTabIcon = [
   {
     name: "Home",
-    inactive: "https://img.icons8.com/windows/32/FFFFFF/home.png",
-    active: "https://img.icons8.com/material-rounded/24/FFFFFF/home.png",
+    inactive: "https://img.icons8.com/material-outlined/100/home--v2.png",
+    active: "https://img.icons8.com/ios-filled/100/home.png",
   },
   {
     name: "Search",
-    inactive: "https://img.icons8.com/ios-filled/50/FFFFFF/search--v1.png",
-    active:
-      "https://img.icons8.com/external-tanah-basah-glyph-tanah-basah/48/FFFFFF/external-search-social-media-ui-tanah-basah-glyph-tanah-basah.png",
+    inactive: "https://img.icons8.com/material-outlined/100/search--v1.png",
+    active:"https://img.icons8.com/ios-filled/100/search--v1.png",
   },
   {
     name: "Reels",
-    inactive: "https://img.icons8.com/ios/50/FFFFFF/instagram-reel.png",
-    active: "https://img.icons8.com/ios-filled/50/FFFFFF/instagram-reel.png",
+    inactive: "https://img.icons8.com/material-outlined/100/lawyer.png",
+    active: "https://img.icons8.com/material/100/lawyer.png",
   },
   {
     name: "Shop",
-    inactive:
-      "https://img.icons8.com/external-anggara-basic-outline-anggara-putra/24/FFFFFF/external-avatar-user-interface-anggara-basic-outline-anggara-putra.png",
-    active:
-      "https://img.icons8.com/external-anggara-glyph-anggara-putra/32/FFFFFF/external-avatar-interface-anggara-glyph-anggara-putra.png",
+    inactive: "https://img.icons8.com/material-outlined/100/user-male-circle.png",
+    active: "https://img.icons8.com/ios-filled/100/user-male-circle.png",
   },
 ];
 
@@ -56,7 +55,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '100%',
     bottom: 0,
-    height: 65,
+    height: height,
     zIndex: 999,
     backgroundColor: GlobalColors.primary.black,
   },
@@ -64,9 +63,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     height: 50,
+    marginTop: 5
   },
   icon: {
-    width: 30,
-    height: 30,
+    width: 27,
+    height: 27,
   },
 });

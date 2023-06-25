@@ -1,12 +1,12 @@
 import React from 'react'
-import {View, Text, SafeAreaView, StyleSheet, Image, TouchableOpacity} from 'react-native'
+import {View, Text, SafeAreaView, StyleSheet, Image, TouchableOpacity, Platform} from 'react-native'
 import { GlobalColors } from '../../constants/GlobalColors'
-
+const paddingTop = Platform.OS === 'android' ? 20 : 35;
 const Header = ({navigation}) => {
     return(
         <View style={styles.container}>
             <TouchableOpacity>
-                <Image style={styles.logo} source={{uri: 'https://www.pngmart.com/files/21/Instagram-PNG-Transparent.png'}}></Image>
+                <Image style={styles.logo} source={require('../../assets/logo.png')}></Image>
             </TouchableOpacity>
 
             <View style={styles.iconsContainer}>
@@ -29,21 +29,20 @@ const Header = ({navigation}) => {
 
 const styles = StyleSheet.create({
     container: {
-        color: GlobalColors.primary.white,
         justifyContent: 'space-between',
         alignItems: 'center',
         flexDirection: 'row',
-        marginHorizontal: 20,
-        marginTop: 8,
+        paddingTop: paddingTop,
+        backgroundColor: GlobalColors.primary.black,
     },
     logo: {
-        width: 100,
-        height: 35,
-        marginLeft: -30,
+        width: 110,
+        height: 55,
         resizeMode: 'contain',
     },
     iconsContainer: {
-        flexDirection: 'row'
+        flexDirection: 'row',
+        marginRight: 15,
     },
     icon: {
         width: 24,
@@ -53,7 +52,7 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 10
     },
     unreadBadge: {
-        backgroundColor: 'red',
+        backgroundColor: GlobalColors.primary.white,
         position: 'absolute',
         left: 20,
         bottom: 18,
@@ -65,7 +64,7 @@ const styles = StyleSheet.create({
         zIndex: 100,
     },
     unreadBadgeText: {
-        color: GlobalColors.primary.white,
+        color: GlobalColors.primary.black,
         fontWeight: '600'
     }
 })

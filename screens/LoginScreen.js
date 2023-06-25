@@ -13,6 +13,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { setAuthUser } from '../redux/actions';
 import { API } from '../constants/GlobalAPI';
 import axios from 'axios';
+import { GlobalColors } from '../constants/GlobalColors';
 
 const SERVER_STATE = API.CURRENT_STATE
 
@@ -53,7 +54,7 @@ const LoginScreen = ({navigation}) => {
 
   return (
     <View style={styles.container}>
-      <Image source={{uri: 'https://freelogopng.com/images/all_img/1658586823instagram-logo-transparent.png'}} style={styles.logo} />
+      <Image source={require('../assets/logo.png')} style={styles.logo} />
       <TextInput
         style={styles.input}
         placeholder="Phone number, username, or email"
@@ -105,8 +106,8 @@ const styles = StyleSheet.create({
     padding: 20
   },
   logo: {
-    width: 100,
-    height: 100,
+    width: 225,
+    height: 189,
     marginBottom: 40
   },
   input: {
@@ -126,7 +127,7 @@ const styles = StyleSheet.create({
   loginButton: {
     width: '100%',
     height: 50,
-    backgroundColor: '#0095f6',
+    backgroundColor: GlobalColors.elements.loginButton,
     borderRadius: 5,
     alignItems: 'center',
     justifyContent: 'center',
@@ -143,7 +144,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
 },
 forgotPasswordText: {
-color: '#003569',
+color: GlobalColors.primary.black,
 fontSize: 14,
 fontWeight: 'bold'
 },
@@ -167,7 +168,7 @@ marginHorizontal: 10
 facebookLoginButton: {
 width: '100%',
 height: 50,
-backgroundColor: '#3B5998',
+backgroundColor: GlobalColors.primary.black,
 borderRadius: 5,
 alignItems: 'center',
 justifyContent: 'center',

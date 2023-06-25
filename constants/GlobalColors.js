@@ -1,15 +1,18 @@
 export const GlobalColors = {
     primary: {
-        black: '#6c7870',
-        white: '##C0D9C8',
-        unreadBadge: '#FF3250'
+        black: '#4a807d',
+        white: '#f7fafa',
+        unreadBadge: '#FF3250',
+        realBlack: 'black',
     },
     elements: {
         storyBorderColor: '#ff8501',
         globalTextPrimaryColor: 'white',
+        loginButton: '#7fb5b2',
+        loginwithGoogle: '#4a807d'
     },
     text: {
-        postText: 'white',
+        postText: 'black',
         storyText: 'white',
     }
 }
