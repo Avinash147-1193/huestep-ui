@@ -1,5 +1,7 @@
 import  React, {useState, useEffect} from 'react'
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
+import { Video } from 'expo-av';
+import * as ImagePicker from 'expo-image-picker';
 import { Divider } from 'react-native-elements'
 import { GlobalColors } from '../../constants/GlobalColors'
 import { API } from '../../constants/GlobalAPI'
@@ -80,6 +82,7 @@ const Post = ({post}) => {
         <Caption post={post} />
         <CommentSection post={post} />
         <Comments post={post} />
+        <Divider width={1} orientation="vertical" style={styles.divider}/>
       </View>
       
     </View>
@@ -107,14 +110,38 @@ const PostHeader = ({post}) => (
   </View>
 )
 
-const PostImage = ({post}) => (
-  <View style={{
-    width: '100%',
-    height: 450,
-  }}>
-    <Image source={{uri: post.fields.post_images}} style={{ height: '100%', resizeMode: 'cover'}} />
-  </View>
-)
+const PostImage = ({ post }) => {
+  const postImages = post.fields.post_images;
+
+  if (postImages.endsWith('.jpg') || postImages.endsWith('.png') || postImages.endsWith('.gif')) {
+    return (
+      <View style={{
+        width: '100%',
+        height: 450,
+      }}>
+        <Image source={{ uri: postImages }} style={{ height: '100%', resizeMode: 'cover' }} />
+      </View>
+    );
+  } else if (postImages.endsWith('.mp4')) {
+    return (
+      <View style={{
+        width: '100%',
+        height: 450,
+      }}>
+        <Video
+          source={{ uri: postImages }}
+          style={{ height: '100%', resizeMode: 'cover' }}
+          shouldPlay
+          useNativeControls
+        />
+      </View>
+    );
+  } else {
+    return null; // Handle other file types or unsupported formats
+  }
+};
+
+
 
 const PostFooter = ( {post, user_liked_posts, HandleLike, like} ) => (
 
@@ -193,4 +220,7 @@ const styles = StyleSheet.create({
     width: '32%',
     justifyContent: 'space-between',
   },
+  divider: {
+    marginTop: 10,
+  }
 })
