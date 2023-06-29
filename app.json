@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "huestep-ui",
-    "slug": "huestep-ui",
+    "slug": "huestep",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -25,6 +25,12 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "d7980c3c-6a34-4b40-9df0-a20cf6698976"
+      }
+    },
+    "owner": "8240878435"
   }
 }
