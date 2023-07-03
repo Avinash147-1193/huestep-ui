@@ -141,7 +141,7 @@ const HomeScreen = ({ navigation }) => {
         >
           {posts.map((post, index) => (
             <View key={index}>
-              <Post post={post} videoInView={videoInView} />
+              <Post post={post} navigation={navigation} videoInView={videoInView} />
             </View>
           ))}
         </ScrollView>
