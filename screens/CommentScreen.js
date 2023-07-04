@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
     minHeight: 60,
     flexDirection: "row",
     backgroundColor: GlobalColors.primary.black,
-    marginTop: -65,
+    marginTop: -25,
   },
 
   commentInput: {
