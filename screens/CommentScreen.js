@@ -113,8 +113,12 @@ const CommentScreen = ({ post, navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView>
+        <View>
+
+        
         <BackButtonHeader style={styles.backButton} navigation={navigation} />
+      <ScrollView>
+        
 
         {/* Image or video from the original post */}
         <View style={styles.postMedia}>
@@ -165,6 +169,7 @@ const CommentScreen = ({ post, navigation }) => {
           <Text style={styles.postButtonText}>Post</Text>
         </TouchableOpacity>
       </View>
+      </View>
     </SafeAreaView>
   );
 };
@@ -205,16 +210,15 @@ const Comment = ({ post, icon }) => {
             {showReplies ? "Hide Replies" : "View Replies"}
           </Text>
         </TouchableOpacity>
-
-        {/* Render replies */}
-        {showReplies && (
+      </View>
+       {/* Render replies */}
+       {showReplies && (
           <View style={styles.repliesContainer}>
             {post.replies.map((reply) => (
               <Reply key={reply.id} reply={reply} icon={icon} />
             ))}
           </View>
         )}
-      </View>
     </View>
   );
 };
@@ -255,29 +259,25 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   backButtonText: {
-    fontSize: 16,
+    fontSize: 13,
     fontWeight: "bold",
   },
   postMedia: {},
   dropdownContainer: {
     width: 150,
-    marginBottom: 16,
   },
   dropdown: {
-    backgroundColor: "#fafafa",
+    backgroundColor: GlobalColors.primary.white,
     borderWidth: 0,
   },
   dropdownItem: {
     justifyContent: "flex-start",
   },
   dropdownLabel: {
-    fontSize: 16,
+    fontSize: 13,
     color: "#333333",
   },
   commentInputContainer: {
-    position: "absolute",
-    width: "100%",
-    marginTop: "188%",
     flex: 1,
     flexDirection: "row",
   },
@@ -286,71 +286,83 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 12,
     width: "75%",
-    height: 85,
+    height: 45,
     borderWidth: 1,
     borderColor: "#aaaaaa",
     backgroundColor: GlobalColors.primary.white,
     borderRadius: 8,
-    fontSize: 16,
+    fontSize: 13,
   },
   postButton: {
     backgroundColor: GlobalColors.primary.black,
     alignItems: "center",
     justifyContent: "center",
     width: "24%",
-    height: 85,
+    height: 45,
     borderRadius: 8,
     borderWidth: 1,
     marginLeft: 4,
     borderColor: GlobalColors.primary.white,
   },
   postButtonText: {
-    fontSize: 16,
+    fontSize: 13,
     fontWeight: "bold",
     color: GlobalColors.primary.white,
   },
   commentContainer: {
-    marginBottom: 16,
     padding: 16,
     borderRadius: 8,
     backgroundColor: GlobalColors.primary.black,
   },
   commentText: {
-    fontSize: 16,
+    flex: 1,
+    fontSize: 13,
     marginBottom: 8,
     color: GlobalColors.primary.white,
     marginLeft: 5,
+    flexWrap: 'wrap',
   },
   actionButton: {
-    marginRight: 8,
   },
   actionButtonText: {
-    fontSize: 16,
+    width: 110,
+    marginLeft: 5,
+    fontSize: 13,
     color: GlobalColors.primary.white,
+    flex: 1,
   },
   repliesContainer: {
+    width: '100%',
     marginTop: 8,
-    paddingLeft: 16,
+    marginLeft: '15%',
+    paddingLeft: 10,
     borderLeftWidth: 1,
     borderColor: GlobalColors.primary.white,
   },
   replyContainer: {
     flexDirection: "column",
     marginBottom: 8,
-    marginLeft: 0,
+    flex: 1,
   },
   replyText: {
-    fontSize: 16,
+    fontSize: 13,
     marginRight: 8,
     color: GlobalColors.primary.white,
+    flexWrap: 'wrap',
   },
   LikeButton: {
     height: 20,
     width: 20,
+    flex: 1,
+    marginLeft: 3,
+    marginRight: 8,
+    marginTop: -3,
   },
   replyReactionsContainer: {
     flexDirection: "row",
     alignItems: "center",
+    flex: 1,
+    marginTop: 10,
   },
   postArea: {
     height: 300,
@@ -359,8 +371,8 @@ const styles = StyleSheet.create({
   story: {
     width: 35,
     height: 35,
+    marginVertical: 8,
     borderRadius: 50,
-    marginLeft: 10,
     borderWidth: 1.5,
     borderColor: GlobalColors.elements.storyBorderColor,
   },
