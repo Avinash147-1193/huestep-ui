@@ -113,62 +113,65 @@ const CommentScreen = ({ post, navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-        <View>
-
-        
+      <View>
         <BackButtonHeader style={styles.backButton} navigation={navigation} />
-      <ScrollView>
-        
-
-        {/* Image or video from the original post */}
-        <View style={styles.postMedia}>
-          <Image
-            source={{
-              uri:
-                "https://images.unsplash.com/photo-1541963463532-d68292c34b19?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8Ym9va3xlbnwwfHwwfHx8MA%3D%3D&w=1000&q=80",
-            }}
-            style={styles.postArea}
-          />
-        </View>
-
-        {/* Dropdown for comment sorting */}
-        <DropDownPicker
-          items={[
-            { label: "Newest First", value: "newest" },
-            { label: "Most Relevant", value: "relevant" },
-            { label: "My Own", value: "own" },
-          ]}
-          defaultValue={sortingOption}
-          containerStyle={styles.dropdownContainer}
-          style={styles.dropdown}
-          itemStyle={styles.dropdownItem}
-          labelStyle={styles.dropdownLabel}
-          onChangeItem={handleSortingChange}
-        />
-
-        {/* Render comments and replies */}
-        {posts.map((post) => (
-          <View>
-            <Comment key={post.id} post={post} icon={likeButtonIcon} />
-            <Divider width={1} orientation="vertical" style={styles.divider} />
+        <ScrollView>
+          {/* Image or video from the original post */}
+          <View style={styles.postMedia}>
+            <Image
+              source={{
+                uri:
+                  "https://images.unsplash.com/photo-1541963463532-d68292c34b19?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8Ym9va3xlbnwwfHwwfHx8MA%3D%3D&w=1000&q=80",
+              }}
+              style={styles.postArea}
+            />
           </View>
-        ))}
 
-        {/* Input box for typing a comment */}
-      </ScrollView>
-      <View style={styles.commentInputContainer}>
-        <TextInput
-          value={comment}
-          onChangeText={handleCommentChange}
-          placeholder="Write a comment..."
-          multiline={true}
-          numberOfLines={3}
-          style={styles.commentInput}
-        />
-        <TouchableOpacity onPress={handlePostComment} style={styles.postButton}>
-          <Text style={styles.postButtonText}>Post</Text>
-        </TouchableOpacity>
-      </View>
+          {/* Dropdown for comment sorting */}
+          <DropDownPicker
+            items={[
+              { label: "Newest First", value: "newest" },
+              { label: "Most Relevant", value: "relevant" },
+              { label: "My Own", value: "own" },
+            ]}
+            defaultValue={sortingOption}
+            containerStyle={styles.dropdownContainer}
+            style={styles.dropdown}
+            itemStyle={styles.dropdownItem}
+            labelStyle={styles.dropdownLabel}
+            onChangeItem={handleSortingChange}
+          />
+
+          {/* Render comments and replies */}
+          {posts.map((post) => (
+            <View>
+              <Comment key={post.id} post={post} icon={likeButtonIcon} />
+              <Divider
+                width={1}
+                orientation="vertical"
+                style={styles.divider}
+              />
+            </View>
+          ))}
+
+          {/* Input box for typing a comment */}
+        </ScrollView>
+        <View style={styles.commentInputContainer}>
+          <TextInput
+            value={comment}
+            onChangeText={handleCommentChange}
+            placeholder="Write a comment..."
+            multiline={true}
+            numberOfLines={3}
+            style={styles.commentInput}
+          />
+          <TouchableOpacity
+            onPress={handlePostComment}
+            style={styles.postButton}
+          >
+            <Text style={styles.postButtonText}>Post</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -211,14 +214,14 @@ const Comment = ({ post, icon }) => {
           </Text>
         </TouchableOpacity>
       </View>
-       {/* Render replies */}
-       {showReplies && (
-          <View style={styles.repliesContainer}>
-            {post.replies.map((reply) => (
-              <Reply key={reply.id} reply={reply} icon={icon} />
-            ))}
-          </View>
-        )}
+      {/* Render replies */}
+      {showReplies && (
+        <View style={styles.repliesContainer}>
+          {post.replies.map((reply) => (
+            <Reply key={reply.id} reply={reply} icon={icon} />
+          ))}
+        </View>
+      )}
     </View>
   );
 };
@@ -283,10 +286,12 @@ const styles = StyleSheet.create({
   },
 
   commentInput: {
+    marginTop: -65,
+    marginLeft: 10,
     paddingVertical: 8,
     paddingHorizontal: 12,
     width: "75%",
-    height: 45,
+    height: 50,
     borderWidth: 1,
     borderColor: "#aaaaaa",
     backgroundColor: GlobalColors.primary.white,
@@ -294,11 +299,12 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   postButton: {
+    marginTop: -65,
     backgroundColor: GlobalColors.primary.black,
     alignItems: "center",
     justifyContent: "center",
-    width: "24%",
-    height: 45,
+    width: "20%",
+    height: 50,
     borderRadius: 8,
     borderWidth: 1,
     marginLeft: 4,
@@ -320,10 +326,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     color: GlobalColors.primary.white,
     marginLeft: 5,
-    flexWrap: 'wrap',
+    flexWrap: "wrap",
   },
-  actionButton: {
-  },
+  actionButton: {},
   actionButtonText: {
     width: 110,
     marginLeft: 5,
@@ -332,9 +337,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   repliesContainer: {
-    width: '100%',
+    width: "100%",
     marginTop: 8,
-    marginLeft: '15%',
+    marginLeft: "15%",
     paddingLeft: 10,
     borderLeftWidth: 1,
     borderColor: GlobalColors.primary.white,
@@ -348,7 +353,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginRight: 8,
     color: GlobalColors.primary.white,
-    flexWrap: 'wrap',
+    flexWrap: "wrap",
   },
   LikeButton: {
     height: 20,
