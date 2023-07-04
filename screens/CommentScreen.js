@@ -282,16 +282,17 @@ const styles = StyleSheet.create({
   },
   commentInputContainer: {
     flex: 1,
+    minHeight: 60,
     flexDirection: "row",
+    backgroundColor: GlobalColors.primary.black,
+    marginTop: -65,
   },
 
   commentInput: {
-    marginTop: -65,
     marginLeft: 10,
     paddingVertical: 8,
     paddingHorizontal: 12,
     width: "75%",
-    height: 50,
     borderWidth: 1,
     borderColor: "#aaaaaa",
     backgroundColor: GlobalColors.primary.white,
@@ -299,12 +300,10 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   postButton: {
-    marginTop: -65,
     backgroundColor: GlobalColors.primary.black,
     alignItems: "center",
     justifyContent: "center",
     width: "20%",
-    height: 50,
     borderRadius: 8,
     borderWidth: 1,
     marginLeft: 4,
