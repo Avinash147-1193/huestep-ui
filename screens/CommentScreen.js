@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,18 +8,33 @@ import {
   StyleSheet,
   Image,
   SafeAreaView,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import DropDownPicker from "react-native-picker-select"; // Import DropDownPicker
 import BackButtonHeader from "../components/commonElements/BackButtonHeader";
 import { GlobalColors } from "../constants/GlobalColors";
+import { API } from "../constants/GlobalAPI"
 import { Divider } from "react-native-elements";
+import { useRoute } from '@react-navigation/native';
+import { useSelector, useDispatch } from 'react-redux';
+import axios from "axios";
+
+const SERVER_STATE = API.CURRENT_STATE;
 // CommentSectionPage component
 const CommentScreen = ({ post, navigation }) => {
   const [sortingOption, setSortingOption] = useState("newest");
-  const [comment, setComment] = useState("");
-  let colorOfButton = GlobalColors.buttonColor.comment;
+  const [comment, setComment] = useState({});
+  
+  const { user } = useSelector(state => state.userReducer);
+  const route = useRoute();
+  // const { postDetails} = route.params;
+  // console.log(postDetails)
+
+  let colorOfBackButton = GlobalColors.buttonColor.backButtonComment;
+  let colorOfLikeButton = GlobalColors.buttonColor.commentLike;
   const likeButtonIcon =
-    "https://img.icons8.com/ios/50/" + colorOfButton + "/facebook-like--v1.png";
+    "https://img.icons8.com/ios/50/" + colorOfLikeButton + "/facebook-like--v1.png";
 
   const posts = [
     {
@@ -93,6 +108,28 @@ const CommentScreen = ({ post, navigation }) => {
     },
   ];
 
+  useEffect(() => {
+    let fetchCommentsOnPost = async () => {
+      console.log('------testtttt------', user.user_id, user.token, API[SERVER_STATE] + API.POST.comments)
+      try {
+        let baseUrl = API[SERVER_STATE] + API.POST.comments;
+        let response = await axios.get(baseUrl, {
+          params: {
+            username: user.user_id,
+            token: user.token,
+            post: { },
+            post_id: "096437c1-5043-40e4-b515-734955c55d3e",
+          },
+        });
+        console.log('------comments loading-----', response.data.post.comments)
+        setComment(response.data.post.comments)
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchCommentsOnPost()
+  }, []);
+
   const handleSortingChange = (item) => {
     setSortingOption(item.value);
   };
@@ -110,12 +147,15 @@ const CommentScreen = ({ post, navigation }) => {
     // Logic to navigate back
     // ...
   };
+  
 
   return (
+    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={styles.keyboardAvoidingView}>
     <SafeAreaView style={styles.container}>
-      <View>
-        <BackButtonHeader style={styles.backButton} navigation={navigation} />
-        <ScrollView>
+      <View style={{flex: 1}}>
+        <BackButtonHeader style={styles.backButton} navigation={navigation} color={colorOfBackButton} />
+        <ScrollView style={{ flex: 1 , minHeight: '75%'}}>
           {/* Image or video from the original post */}
           <View style={styles.postMedia}>
             <Image
@@ -156,6 +196,7 @@ const CommentScreen = ({ post, navigation }) => {
 
           {/* Input box for typing a comment */}
         </ScrollView>
+        
         <View style={styles.commentInputContainer}>
           <TextInput
             value={comment}
@@ -172,8 +213,10 @@ const CommentScreen = ({ post, navigation }) => {
             <Text style={styles.postButtonText}>Post</Text>
           </TouchableOpacity>
         </View>
+        
       </View>
     </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -201,6 +244,9 @@ const Comment = ({ post, icon }) => {
       {/* Render likes and reply button */}
 
       <View style={styles.replyReactionsContainer}>
+        <Text >
+          20 Likes
+        </Text>
         <TouchableOpacity
           onPress={() => handleLike(post)}
           style={styles.actionButton}
@@ -211,6 +257,11 @@ const Comment = ({ post, icon }) => {
         <TouchableOpacity onPress={toggleReplies} style={styles.actionButton}>
           <Text style={styles.actionButtonText}>
             {showReplies ? "Hide Replies" : "View Replies"}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.actionButton}>
+          <Text style={styles.actionButtonText}>
+          Reply to comment
           </Text>
         </TouchableOpacity>
       </View>
@@ -243,12 +294,13 @@ const Reply = ({ reply, icon }) => {
           onPress={() => handleReply(reply)}
           style={styles.actionButton}
         >
-          <Text style={styles.actionButtonText}>Reply</Text>
+          <Text style={styles.actionButtonText}>Reply to comment</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -270,7 +322,7 @@ const styles = StyleSheet.create({
     width: 150,
   },
   dropdown: {
-    backgroundColor: GlobalColors.primary.white,
+    backgroundColor: GlobalColors.primary.black,
     borderWidth: 0,
   },
   dropdownItem: {
@@ -282,10 +334,9 @@ const styles = StyleSheet.create({
   },
   commentInputContainer: {
     flex: 1,
-    minHeight: 60,
     flexDirection: "row",
     backgroundColor: GlobalColors.primary.black,
-    marginTop: -25,
+    maxHeight: 55,
   },
 
   commentInput: {
@@ -293,6 +344,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 12,
     width: "75%",
+    height: 50,
     borderWidth: 1,
     borderColor: "#aaaaaa",
     backgroundColor: GlobalColors.primary.white,
@@ -300,40 +352,40 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   postButton: {
-    backgroundColor: GlobalColors.primary.black,
+    backgroundColor: GlobalColors.primary.white,
     alignItems: "center",
     justifyContent: "center",
     width: "20%",
+    height: 50,
     borderRadius: 8,
     borderWidth: 1,
     marginLeft: 4,
-    borderColor: GlobalColors.primary.white,
+    borderColor: GlobalColors.primary.black,
   },
   postButtonText: {
     fontSize: 13,
     fontWeight: "bold",
-    color: GlobalColors.primary.white,
+    color: GlobalColors.primary.black,
   },
   commentContainer: {
     padding: 16,
-    borderRadius: 8,
-    backgroundColor: GlobalColors.primary.black,
+    backgroundColor: GlobalColors.primary.white,
   },
   commentText: {
     flex: 1,
     fontSize: 13,
     marginBottom: 8,
-    color: GlobalColors.primary.white,
+    color: GlobalColors.text.postText,
     marginLeft: 5,
     flexWrap: "wrap",
   },
   actionButton: {},
   actionButtonText: {
-    width: 110,
-    marginLeft: 5,
+    marginLeft: 10,
     fontSize: 13,
-    color: GlobalColors.primary.white,
+    color: GlobalColors.text.postText,
     flex: 1,
+    marginRight: 8,
   },
   repliesContainer: {
     width: "100%",
@@ -341,7 +393,7 @@ const styles = StyleSheet.create({
     marginLeft: "15%",
     paddingLeft: 10,
     borderLeftWidth: 1,
-    borderColor: GlobalColors.primary.white,
+    borderColor: GlobalColors.primary.black,
   },
   replyContainer: {
     flexDirection: "column",
@@ -351,14 +403,14 @@ const styles = StyleSheet.create({
   replyText: {
     fontSize: 13,
     marginRight: 8,
-    color: GlobalColors.primary.white,
+    color: GlobalColors.text.postText,
     flexWrap: "wrap",
   },
   LikeButton: {
     height: 20,
     width: 20,
     flex: 1,
-    marginLeft: 3,
+    marginLeft: 10,
     marginRight: 8,
     marginTop: -3,
   },
@@ -379,6 +431,9 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     borderWidth: 1.5,
     borderColor: GlobalColors.elements.storyBorderColor,
+  },
+  keyboardAvoidingView: {
+    flex: 1,
   },
 });
 

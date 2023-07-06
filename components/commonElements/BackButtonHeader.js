@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, TextInput, StyleSheet, Image } from 'react-native';
 import { GlobalColors } from '../../constants/GlobalColors';
 
-const BackButtonHeader = ({navigation}) => (
+const BackButtonHeader = ({navigation, color}) => (
     <View style={styles.headerContainer}>
       <TouchableOpacity onPress={() => navigation.goBack()}>
-        <Image source={{uri: 'https://img.icons8.com/ios-glyphs/30/FFFFFF/back.png'}} style={{width: 30, height: 30}} />
+        <Image source={{uri: 'https://img.icons8.com/ios-glyphs/30/'+color+'/back.png'}} style={{width: 30, height: 30}} />
       </TouchableOpacity>
     </View>
   )

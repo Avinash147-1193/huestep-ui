@@ -16,6 +16,8 @@ export const GlobalColors = {
         storyText: 'white',
     },
     buttonColor: {
-        comment : 'f7fafa',
+        comment : '4a807d',
+        backButtonComment: 'f7fafa',
+        commentLike: 'black',
     }
 }

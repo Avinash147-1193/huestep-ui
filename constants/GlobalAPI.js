@@ -7,5 +7,8 @@ export const API = {
         profile: 'profile/',
         post: 'post/',
         postLike: 'post/like/',
-    }
+    },
+    POST: {
+        comments : 'post/comment/'
+    },
 }

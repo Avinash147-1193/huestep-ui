@@ -180,25 +180,7 @@ const PostImage = ({ post, scrollViewRef, videoInView, setVideoInView }) => {
     setVideoInView(isVideoInView);
   };
 
-  if (
-    postImages.endsWith(".jpg") ||
-    postImages.endsWith(".png") ||
-    postImages.endsWith(".gif")
-  ) {
-    return (
-      <View
-        style={{
-          width: "100%",
-          height: 450,
-        }}
-      >
-        <Image
-          source={{ uri: postImages }}
-          style={{ height: "100%", resizeMode: "cover" }}
-        />
-      </View>
-    );
-  } else if (postImages.endsWith(".mp4")) {
+  if (postImages.endsWith(".mp4")) {
     return (
       <View
         style={{
@@ -216,7 +198,19 @@ const PostImage = ({ post, scrollViewRef, videoInView, setVideoInView }) => {
       </View>
     );
   } else {
-    return null; // Handle other file types or unsupported formats
+    return (
+      <View
+        style={{
+          width: "100%",
+          height: 450,
+        }}
+      >
+        <Image
+          source={{ uri: postImages }}
+          style={{ height: "100%", resizeMode: "cover" }}
+        />
+      </View>
+    ); // Handle other file types or unsupported formats
   }
 };
 
@@ -234,7 +228,7 @@ const PostFooter = ({ post, user_liked_posts, HandleLike, like, navigation }) =>
       />
       <Icon
         imageStyle={styles.footerIcon}
-        onPress={() => navigation.push('CommentScreen')}
+        onPress={() => navigation.push('CommentScreen', { postDetails: post })}
         imgUrl={postFooterIcons[1].imageUrl}
       />
       <Icon
