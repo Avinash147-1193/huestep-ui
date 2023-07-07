@@ -57,16 +57,6 @@ const Post = ({ post, navigation }) => {
     setLikesCount(post.fields.likes);
     if (user_liked_posts.indexOf(post.pk) >= 0) {
       setLike(1);
-      console.log(
-        "----usereffect if----",
-        post.fields.likes,
-        "--------likes---",
-        post.fields.likes,
-        "---------post.pk----",
-        post.pk,
-        "------user_liked_posts----",
-        user_liked_posts
-      );
     } else {
       setLike(0);
     }
@@ -80,13 +70,6 @@ const Post = ({ post, navigation }) => {
 
     try {
       let baseUrl = API[SERVER_STATE] + API.USER.postLike;
-      console.log(
-        baseUrl,
-        "---username1--",
-        user.user_id,
-        "---token----",
-        user.token
-      );
       const response = axios.post(baseUrl, {
         username: user.user_id,
         token: user.token,

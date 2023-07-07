@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 import {
   View,
   Text,
@@ -17,100 +17,100 @@ import { GlobalColors } from "../constants/GlobalColors";
 import { API } from "../constants/GlobalAPI"
 import { Divider } from "react-native-elements";
 import { useRoute } from '@react-navigation/native';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import axios from "axios";
+import SkeletonLoader from "../components/commonElements/SkeletonLoader";
 
 const SERVER_STATE = API.CURRENT_STATE;
 // CommentSectionPage component
-const CommentScreen = ({ post, navigation }) => {
+const CommentScreen = ({ navigation }) => {
   const [sortingOption, setSortingOption] = useState("newest");
-  const [comment, setComment] = useState({});
+  const [comments, setComment] = useState([]);
   
   const { user } = useSelector(state => state.userReducer);
   const route = useRoute();
-  // const { postDetails} = route.params;
-  // console.log(postDetails)
-
+  const { postDetails } = route.params;
+  console.log('-----post passed data---------',postDetails);
+  
   let colorOfBackButton = GlobalColors.buttonColor.backButtonComment;
   let colorOfLikeButton = GlobalColors.buttonColor.commentLike;
   const likeButtonIcon =
     "https://img.icons8.com/ios/50/" + colorOfLikeButton + "/facebook-like--v1.png";
 
-  const posts = [
-    {
-      id: 1,
-      text:
-        "Test comment one with a very long text, also there might be some media attached to this text as well. Not sure as of now. ",
-      replies: [
-        {
-          id: 11,
-          text:
-            "Reply Test comment one with a very long text, also there might be some media attached to this text as well. Not sure as of now. ",
-        },
-        {
-          id: 12,
-          text:
-            "Reply Test comment one with a very long text, also there might be some media attached to this text as well. Not sure as of now. ",
-        },
-      ],
-    },
-    {
-      id: 2,
-      text:
-        "CommentTest comment one with a very long text, also there might be some media attached to this text as well. Not sure as of now. ",
-      replies: [],
-    },
-    {
-      id: 1,
-      text:
-        "Comment djhsjldjs ndue bshyeisbnbhjdtyue bfgtgeyb Test comment one with a very long text, also there might be some media attached to this text as well. Not sure as of now. ",
-      replies: [
-        {
-          id: 11,
-          text:
-            "Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is ",
-        },
-        {
-          id: 12,
-          text: "Reply 2",
-        },
-      ],
-    },
-    {
-      id: 1,
-      text: "Comment 1",
-      replies: [
-        {
-          id: 11,
-          text: "Reply 1",
-        },
-        {
-          id: 12,
-          text: "Reply 2",
-        },
-      ],
-    },
-    {
-      id: 1,
-      text:
-        "Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is ",
-      replies: [
-        {
-          id: 11,
-          text:
-            "Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is ",
-        },
-        {
-          id: 12,
-          text: "Reply 2",
-        },
-      ],
-    },
-  ];
+  // const posts = [
+  //   {
+  //     id: 1,
+  //     text:
+  //       "Test comment one with a very long text, also there might be some media attached to this text as well. Not sure as of now. ",
+  //     replies: [
+  //       {
+  //         id: 11,
+  //         text:
+  //           "Reply Test comment one with a very long text, also there might be some media attached to this text as well. Not sure as of now. ",
+  //       },
+  //       {
+  //         id: 12,
+  //         text:
+  //           "Reply Test comment one with a very long text, also there might be some media attached to this text as well. Not sure as of now. ",
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     id: 2,
+  //     text:
+  //       "CommentTest comment one with a very long text, also there might be some media attached to this text as well. Not sure as of now. ",
+  //     replies: [],
+  //   },
+  //   {
+  //     id: 1,
+  //     text:
+  //       "Comment djhsjldjs ndue bshyeisbnbhjdtyue bfgtgeyb Test comment one with a very long text, also there might be some media attached to this text as well. Not sure as of now. ",
+  //     replies: [
+  //       {
+  //         id: 11,
+  //         text:
+  //           "Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is ",
+  //       },
+  //       {
+  //         id: 12,
+  //         text: "Reply 2",
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     id: 1,
+  //     text: "Comment 1",
+  //     replies: [
+  //       {
+  //         id: 11,
+  //         text: "Reply 1",
+  //       },
+  //       {
+  //         id: 12,
+  //         text: "Reply 2",
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     id: 1,
+  //     text:
+  //       "Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is ",
+  //     replies: [
+  //       {
+  //         id: 11,
+  //         text:
+  //           "Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is ",
+  //       },
+  //       {
+  //         id: 12,
+  //         text: "Reply 2",
+  //       },
+  //     ],
+  //   },
+  // ];
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     let fetchCommentsOnPost = async () => {
-      console.log('------testtttt------', user.user_id, user.token, API[SERVER_STATE] + API.POST.comments)
       try {
         let baseUrl = API[SERVER_STATE] + API.POST.comments;
         let response = await axios.get(baseUrl, {
@@ -118,10 +118,9 @@ const CommentScreen = ({ post, navigation }) => {
             username: user.user_id,
             token: user.token,
             post: { },
-            post_id: "096437c1-5043-40e4-b515-734955c55d3e",
+            post_id: postDetails.pk,
           },
         });
-        console.log('------comments loading-----', response.data.post.comments)
         setComment(response.data.post.comments)
       } catch (error) {
         console.log(error);
@@ -135,7 +134,7 @@ const CommentScreen = ({ post, navigation }) => {
   };
 
   const handleCommentChange = (text) => {
-    setComment(text);
+    // setComment(text);
   };
 
   const handlePostComment = () => {
@@ -148,6 +147,16 @@ const CommentScreen = ({ post, navigation }) => {
     // ...
   };
   
+  if(comments.length === 0 ){
+    return (
+      <SafeAreaView style={styles.container}>
+      <View style={styles.skeletonContainer}>
+        <SkeletonLoader />
+        <SkeletonLoader />
+      </View>
+      </SafeAreaView>
+    )
+  }
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -183,9 +192,9 @@ const CommentScreen = ({ post, navigation }) => {
           />
 
           {/* Render comments and replies */}
-          {posts.map((post) => (
+          {comments.map((commentInstance) => (
             <View>
-              <Comment key={post.id} post={post} icon={likeButtonIcon} />
+              <Comment key={commentInstance.pk} comment={commentInstance} icon={likeButtonIcon} />
               <Divider
                 width={1}
                 orientation="vertical"
@@ -199,7 +208,7 @@ const CommentScreen = ({ post, navigation }) => {
         
         <View style={styles.commentInputContainer}>
           <TextInput
-            value={comment}
+            value={comments}
             onChangeText={handleCommentChange}
             placeholder="Write a comment..."
             multiline={true}
@@ -221,10 +230,8 @@ const CommentScreen = ({ post, navigation }) => {
 };
 
 // Comment component
-const Comment = ({ post, icon }) => {
+const Comment = ({ comment, icon }) => {
   const [showReplies, setShowReplies] = useState(false);
-
-  console.log("----likeeee1211---", icon);
   const toggleReplies = () => {
     setShowReplies(!showReplies);
   };
@@ -238,17 +245,17 @@ const Comment = ({ post, icon }) => {
           }}
           style={styles.story}
         />
-        <Text style={styles.commentText}>{post.text}</Text>
+        <Text style={styles.commentText}>{comment.fields.text}</Text>
       </View>
 
       {/* Render likes and reply button */}
 
       <View style={styles.replyReactionsContainer}>
         <Text >
-          20 Likes
+          {comment.fields.likes} Likes
         </Text>
         <TouchableOpacity
-          onPress={() => handleLike(post)}
+          onPress={() => handleLike(comment)}
           style={styles.actionButton}
         >
           <Image source={{ uri: icon }} style={styles.LikeButton} />
@@ -266,13 +273,13 @@ const Comment = ({ post, icon }) => {
         </TouchableOpacity>
       </View>
       {/* Render replies */}
-      {showReplies && (
+      {/* {showReplies && (
         <View style={styles.repliesContainer}>
-          {post.replies.map((reply) => (
+          {comment.map((reply) => (
             <Reply key={reply.id} reply={reply} icon={icon} />
           ))}
         </View>
-      )}
+      )} */}
     </View>
   );
 };
@@ -346,7 +353,7 @@ const styles = StyleSheet.create({
     width: "75%",
     height: 50,
     borderWidth: 1,
-    borderColor: "#aaaaaa",
+    borderColor: GlobalColors.text.postText,
     backgroundColor: GlobalColors.primary.white,
     borderRadius: 8,
     fontSize: 13,
@@ -434,6 +441,11 @@ const styles = StyleSheet.create({
   },
   keyboardAvoidingView: {
     flex: 1,
+  },
+  skeletonContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 
