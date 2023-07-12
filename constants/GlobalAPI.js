@@ -9,6 +9,7 @@ export const API = {
         postLike: 'post/like/',
     },
     POST: {
-        comments : 'post/comment/'
+        comments : 'post/comment/',
+        replysOnComment : 'post/reply/',
     },
 }

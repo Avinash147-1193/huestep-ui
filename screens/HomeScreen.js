@@ -34,13 +34,14 @@ const HomeScreen = ({ navigation }) => {
     let fetchUserProfile = async () => {
       try {
         let baseUrl = API[SERVER_STATE] + API.USER.profile;
+        console.log(baseUrl)
         let response = await axios.post(baseUrl, {
           username: username,
           token: authToken,
         });
         dispatch(setAuthUserProfile(response.data))
       } catch (error) {
-        console.log(error);
+        console.log(`failed url: ${baseUrl}`,error);
       }
     };
 
@@ -56,7 +57,7 @@ const HomeScreen = ({ navigation }) => {
         });
         dispatch(setAuthUserPost(response2.data.post.data));
       } catch (error) {
-        console.log(error);
+        console.log(`failed url: ${baseUrl}`,error);
       }
     };
 

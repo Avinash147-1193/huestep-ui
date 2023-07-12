@@ -14,10 +14,10 @@ import {
 import DropDownPicker from "react-native-picker-select"; // Import DropDownPicker
 import BackButtonHeader from "../components/commonElements/BackButtonHeader";
 import { GlobalColors } from "../constants/GlobalColors";
-import { API } from "../constants/GlobalAPI"
+import { API } from "../constants/GlobalAPI";
 import { Divider } from "react-native-elements";
-import { useRoute } from '@react-navigation/native';
-import { useSelector } from 'react-redux';
+import { useRoute } from "@react-navigation/native";
+import { useSelector } from "react-redux";
 import axios from "axios";
 import SkeletonLoader from "../components/commonElements/SkeletonLoader";
 
@@ -26,88 +26,17 @@ const SERVER_STATE = API.CURRENT_STATE;
 const CommentScreen = ({ navigation }) => {
   const [sortingOption, setSortingOption] = useState("newest");
   const [comments, setComment] = useState([]);
-  
-  const { user } = useSelector(state => state.userReducer);
+
+  const { user } = useSelector((state) => state.userReducer);
   const route = useRoute();
   const { postDetails } = route.params;
-  console.log('-----post passed data---------',postDetails);
-  
+
   let colorOfBackButton = GlobalColors.buttonColor.backButtonComment;
   let colorOfLikeButton = GlobalColors.buttonColor.commentLike;
   const likeButtonIcon =
-    "https://img.icons8.com/ios/50/" + colorOfLikeButton + "/facebook-like--v1.png";
-
-  // const posts = [
-  //   {
-  //     id: 1,
-  //     text:
-  //       "Test comment one with a very long text, also there might be some media attached to this text as well. Not sure as of now. ",
-  //     replies: [
-  //       {
-  //         id: 11,
-  //         text:
-  //           "Reply Test comment one with a very long text, also there might be some media attached to this text as well. Not sure as of now. ",
-  //       },
-  //       {
-  //         id: 12,
-  //         text:
-  //           "Reply Test comment one with a very long text, also there might be some media attached to this text as well. Not sure as of now. ",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     id: 2,
-  //     text:
-  //       "CommentTest comment one with a very long text, also there might be some media attached to this text as well. Not sure as of now. ",
-  //     replies: [],
-  //   },
-  //   {
-  //     id: 1,
-  //     text:
-  //       "Comment djhsjldjs ndue bshyeisbnbhjdtyue bfgtgeyb Test comment one with a very long text, also there might be some media attached to this text as well. Not sure as of now. ",
-  //     replies: [
-  //       {
-  //         id: 11,
-  //         text:
-  //           "Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is ",
-  //       },
-  //       {
-  //         id: 12,
-  //         text: "Reply 2",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     id: 1,
-  //     text: "Comment 1",
-  //     replies: [
-  //       {
-  //         id: 11,
-  //         text: "Reply 1",
-  //       },
-  //       {
-  //         id: 12,
-  //         text: "Reply 2",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     id: 1,
-  //     text:
-  //       "Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is ",
-  //     replies: [
-  //       {
-  //         id: 11,
-  //         text:
-  //           "Keys should be unique so that components maintain their identity across updates. Non-unique keys may cause children to be duplicated and/or omitted — the behavior is ",
-  //       },
-  //       {
-  //         id: 12,
-  //         text: "Reply 2",
-  //       },
-  //     ],
-  //   },
-  // ];
+    "https://img.icons8.com/ios/50/" +
+    colorOfLikeButton +
+    "/facebook-like--v1.png";
 
   useLayoutEffect(() => {
     let fetchCommentsOnPost = async () => {
@@ -117,16 +46,16 @@ const CommentScreen = ({ navigation }) => {
           params: {
             username: user.user_id,
             token: user.token,
-            post: { },
+            post: {},
             post_id: postDetails.pk,
           },
         });
-        setComment(response.data.post.comments)
+        setComment(response.data.post.comments);
       } catch (error) {
         console.log(error);
       }
     };
-    fetchCommentsOnPost()
+    fetchCommentsOnPost();
   }, []);
 
   const handleSortingChange = (item) => {
@@ -146,96 +75,155 @@ const CommentScreen = ({ navigation }) => {
     // Logic to navigate back
     // ...
   };
-  
-  if(comments.length === 0 ){
+
+  if (comments.length === 0) {
     return (
       <SafeAreaView style={styles.container}>
-      <View style={styles.skeletonContainer}>
-        <SkeletonLoader />
-        <SkeletonLoader />
-      </View>
+        <View style={styles.skeletonContainer}>
+          <SkeletonLoader />
+          <SkeletonLoader />
+        </View>
       </SafeAreaView>
-    )
+    );
   }
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"}
-          style={styles.keyboardAvoidingView}>
-    <SafeAreaView style={styles.container}>
-      <View style={{flex: 1}}>
-        <BackButtonHeader style={styles.backButton} navigation={navigation} color={colorOfBackButton} />
-        <ScrollView style={{ flex: 1 , minHeight: '75%'}}>
-          {/* Image or video from the original post */}
-          <View style={styles.postMedia}>
-            <Image
-              source={{
-                uri:
-                  "https://images.unsplash.com/photo-1541963463532-d68292c34b19?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8Ym9va3xlbnwwfHwwfHx8MA%3D%3D&w=1000&q=80",
-              }}
-              style={styles.postArea}
-            />
-          </View>
-
-          {/* Dropdown for comment sorting */}
-          <DropDownPicker
-            items={[
-              { label: "Newest First", value: "newest" },
-              { label: "Most Relevant", value: "relevant" },
-              { label: "My Own", value: "own" },
-            ]}
-            defaultValue={sortingOption}
-            containerStyle={styles.dropdownContainer}
-            style={styles.dropdown}
-            itemStyle={styles.dropdownItem}
-            labelStyle={styles.dropdownLabel}
-            onChangeItem={handleSortingChange}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.keyboardAvoidingView}
+    >
+      <SafeAreaView style={styles.container}>
+        <View style={{ flex: 1 }}>
+          <BackButtonHeader
+            style={styles.backButton}
+            navigation={navigation}
+            color={colorOfBackButton}
           />
-
-          {/* Render comments and replies */}
-          {comments.map((commentInstance) => (
-            <View>
-              <Comment key={commentInstance.pk} comment={commentInstance} icon={likeButtonIcon} />
-              <Divider
-                width={1}
-                orientation="vertical"
-                style={styles.divider}
+          <ScrollView style={{ flex: 1, minHeight: "75%" }}>
+            {/* Image or video from the original post */}
+            <View style={styles.postMedia}>
+              <Image
+                source={{
+                  uri:
+                    "https://images.unsplash.com/photo-1541963463532-d68292c34b19?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8Ym9va3xlbnwwfHwwfHx8MA%3D%3D&w=1000&q=80",
+                }}
+                style={styles.postArea}
               />
             </View>
-          ))}
 
-          {/* Input box for typing a comment */}
-        </ScrollView>
-        
-        <View style={styles.commentInputContainer}>
-          <TextInput
-            value={comments}
-            onChangeText={handleCommentChange}
-            placeholder="Write a comment..."
-            multiline={true}
-            numberOfLines={3}
-            style={styles.commentInput}
-          />
-          <TouchableOpacity
-            onPress={handlePostComment}
-            style={styles.postButton}
-          >
-            <Text style={styles.postButtonText}>Post</Text>
-          </TouchableOpacity>
+            {/* Dropdown for comment sorting */}
+            <DropDownPicker
+              items={[
+                { label: "Newest First", value: "newest" },
+                { label: "Most Relevant", value: "relevant" },
+                { label: "My Own", value: "own" },
+              ]}
+              defaultValue={sortingOption}
+              containerStyle={styles.dropdownContainer}
+              style={styles.dropdown}
+              itemStyle={styles.dropdownItem}
+              labelStyle={styles.dropdownLabel}
+              onChangeItem={handleSortingChange}
+            />
+
+            {/* Render comments and replies */}
+            {comments.map((commentInstance) => (
+              <View>
+                <Comment
+                  key={commentInstance.pk}
+                  comment={commentInstance}
+                  icon={likeButtonIcon}
+                  user={user}
+                />
+                <Divider
+                  width={1}
+                  orientation="vertical"
+                  style={styles.divider}
+                />
+              </View>
+            ))}
+
+            {/* Input box for typing a comment */}
+          </ScrollView>
+
+          <View style={styles.commentInputContainer}>
+            <TextInput
+              value={comments}
+              onChangeText={handleCommentChange}
+              placeholder="Write a comment..."
+              multiline={true}
+              numberOfLines={3}
+              style={styles.commentInput}
+            />
+            <TouchableOpacity
+              onPress={handlePostComment}
+              style={styles.postButton}
+            >
+              <Text style={styles.postButtonText}>Post</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-        
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
     </KeyboardAvoidingView>
   );
 };
 
 // Comment component
-const Comment = ({ comment, icon }) => {
+const Comment = ({ comment, icon, user }) => {
+  console.log("----main---", comment.fields.replies);
   const [showReplies, setShowReplies] = useState(false);
-  const toggleReplies = () => {
+  const [replies, setReplies] = useState([]);
+  const [fetchedReplies, setFetchedReplies] = useState([]);
+
+  const toggleReplies = async () => {
+    if (!fetchedReplies.includes(comment.pk)) {
+      setFetchedReplies(comment.pk, ...fetchedReplies);
+      let fetchCommentsOnPost = async () => {
+        try {
+          let baseUrl = API[SERVER_STATE] + API.POST.replysOnComment;
+          console.log(
+            "---now hitting: ",
+            baseUrl,
+            "----params:  ",
+            user.user_id,
+            user.token,
+            comment.pk
+          );
+          let response = await axios.get(baseUrl, {
+            params: {
+              username: user.user_id,
+              token: user.token,
+              comment_id: comment.pk,
+            },
+          });
+          console.log("----replies loading----", response.data.replies.data);
+          setReplies(response.data.replies.data, ...replies);
+        } catch (error) {
+          console.log("---error", error);
+        }
+      };
+      fetchCommentsOnPost();
+    }
+
     setShowReplies(!showReplies);
   };
 
+  const ReplyToggleView = () => {
+    console.log("----Tiggle---", comment.fields.replies);
+    return (
+      <TouchableOpacity onPress={toggleReplies} style={styles.actionButton}>
+        <Text style={styles.actionButtonText}>
+          {showReplies ? "Hide Replies" : "View Replies"}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
+
+  const NoReplyView = () => {
+    console.log("----No reply,----", comment.fields.replies);
+    return <Text></Text>;
+  };
+  
   return (
     <View style={styles.commentContainer}>
       <View style={styles.replyReactionsContainer}>
@@ -251,9 +239,7 @@ const Comment = ({ comment, icon }) => {
       {/* Render likes and reply button */}
 
       <View style={styles.replyReactionsContainer}>
-        <Text >
-          {comment.fields.likes} Likes
-        </Text>
+        <Text>{comment.fields.likes} Likes</Text>
         <TouchableOpacity
           onPress={() => handleLike(comment)}
           style={styles.actionButton}
@@ -262,35 +248,41 @@ const Comment = ({ comment, icon }) => {
         </TouchableOpacity>
 
         <TouchableOpacity onPress={toggleReplies} style={styles.actionButton}>
-          <Text style={styles.actionButtonText}>
-            {showReplies ? "Hide Replies" : "View Replies"}
-          </Text>
+          {comment.fields.replies > 0 ? <ReplyToggleView /> : <NoReplyView />}
         </TouchableOpacity>
         <TouchableOpacity style={styles.actionButton}>
-          <Text style={styles.actionButtonText}>
-          Reply to comment
-          </Text>
+          <Text style={styles.actionButtonText}>Reply to comment</Text>
         </TouchableOpacity>
       </View>
       {/* Render replies */}
-      {/* {showReplies && (
+      {showReplies && (
         <View style={styles.repliesContainer}>
-          {comment.map((reply) => (
-            <Reply key={reply.id} reply={reply} icon={icon} />
+          {replies.map((reply) => (
+            <Reply key={reply.pk} reply={reply.fields} icon={icon} />
           ))}
         </View>
-      )} */}
+      )}
     </View>
   );
 };
 
 // Reply component
 const Reply = ({ reply, icon }) => {
+  console.log("-----inside-replies----", reply);
   return (
     <View style={styles.replyContainer}>
-      <Text style={styles.replyText}>{reply.text}</Text>
+      <View style={styles.replyReactionsContainer}>
+        <Image
+          source={{
+            uri: "https://xsgames.co/randomusers/assets/avatars/male/74.jpg",
+          }}
+          style={styles.story}
+        />
+        <Text style={styles.commentText}>{reply.text}</Text>
+      </View>
       {/* Render likes and reply button for the reply */}
       <View style={styles.replyReactionsContainer}>
+        <Text style={styles.actionButton}>{reply.likes} likes</Text>
         <TouchableOpacity
           onPress={() => handleLike(reply)}
           style={styles.actionButton}
@@ -307,7 +299,6 @@ const Reply = ({ reply, icon }) => {
     </View>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {
@@ -403,13 +394,11 @@ const styles = StyleSheet.create({
     borderColor: GlobalColors.primary.black,
   },
   replyContainer: {
-    flexDirection: "column",
-    marginBottom: 8,
-    flex: 1,
+    padding: 5,
+    backgroundColor: GlobalColors.primary.white,
   },
   replyText: {
     fontSize: 13,
-    marginRight: 8,
     color: GlobalColors.text.postText,
     flexWrap: "wrap",
   },
@@ -444,8 +433,8 @@ const styles = StyleSheet.create({
   },
   skeletonContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 
