@@ -10,6 +10,7 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
+  Keyboard,
 } from "react-native";
 import DropDownPicker from "react-native-picker-select"; // Import DropDownPicker
 import BackButtonHeader from "../components/commonElements/BackButtonHeader";
@@ -26,6 +27,9 @@ const SERVER_STATE = API.CURRENT_STATE;
 const CommentScreen = ({ navigation }) => {
   const [sortingOption, setSortingOption] = useState("newest");
   const [comments, setComment] = useState([]);
+  const [noCommentsPost, setNoCommentsPost] = useState('');
+  const [commentInput, setCommentInput] = useState('');
+  
 
   const { user } = useSelector((state) => state.userReducer);
   const route = useRoute();
@@ -51,6 +55,11 @@ const CommentScreen = ({ navigation }) => {
           },
         });
         setComment(response.data.post.comments);
+        console.log('----comments---', response.data.post)
+        if(response.data.post.comments.length === 0)
+          setNoCommentsPost(true)
+        else
+          setNoCommentsPost(false)
       } catch (error) {
         console.log(error);
       }
@@ -66,8 +75,34 @@ const CommentScreen = ({ navigation }) => {
     // setComment(text);
   };
 
-  const handlePostComment = () => {
-    // Logic to post the comment
+  const handlePostComment =  () => {
+    Keyboard.dismiss();
+    console.log(commentInput.commentInput);
+    if( commentInput.commentInput ){
+      let createUserComment = async () => {
+        try {
+          let baseUrl = API[SERVER_STATE] + API.POST.comments;
+          console.log(baseUrl)
+          let response = await axios.post(baseUrl, {
+            username: user.user_id,
+            token: user.token,
+            comment: {
+              user_id : user.user_id,
+              post_id : postDetails.pk,
+              text : commentInput.commentInput,
+              tagged_users: "1, 2, 3",
+              comment_image : "https: //www.pngfind.com/pngs/m/39-398349_computer-icons-user-profile-facebook-instagram-instagram-profile.png",
+              comment_video : "https: //www.pngfind.com/pngs/m/39-398349_computer-icons-user-profile-facebook-instagram-instagram-profile.png"
+          }
+          });
+        } catch (error) {
+          console.log(error);
+        }
+      };
+      createUserComment();
+    }
+    
+    setCommentInput('');
     // ...
   };
 
@@ -76,7 +111,7 @@ const CommentScreen = ({ navigation }) => {
     // ...
   };
 
-  if (comments.length === 0) {
+  if (comments.length === 0 && !noCommentsPost) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.skeletonContainer}>
@@ -85,6 +120,12 @@ const CommentScreen = ({ navigation }) => {
         </View>
       </SafeAreaView>
     );
+  } else if(noCommentsPost){
+    <SafeAreaView style={styles.container}>
+      <View style={styles.skeletonContainer}>
+        <Text>There are no comments on this post</Text>
+      </View>
+    </SafeAreaView>
   }
 
   return (
@@ -148,12 +189,12 @@ const CommentScreen = ({ navigation }) => {
 
           <View style={styles.commentInputContainer}>
             <TextInput
-              value={comments}
-              onChangeText={handleCommentChange}
+              onChangeText={(commentInput) => setCommentInput({commentInput})}
               placeholder="Write a comment..."
               multiline={true}
               numberOfLines={3}
               style={styles.commentInput}
+              value={commentInput}
             />
             <TouchableOpacity
               onPress={handlePostComment}
@@ -396,11 +437,13 @@ const styles = StyleSheet.create({
   replyContainer: {
     padding: 5,
     backgroundColor: GlobalColors.primary.white,
+    flex:1,
+    maxWidth: '90%'
   },
   replyText: {
     fontSize: 13,
     color: GlobalColors.text.postText,
-    flexWrap: "wrap",
+    
   },
   LikeButton: {
     height: 20,

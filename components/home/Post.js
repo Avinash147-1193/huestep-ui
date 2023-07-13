@@ -9,7 +9,8 @@ import {
   Dimensions,
 } from "react-native";
 import Constants from "expo-constants";
-
+import PostHeader from "../post/header";
+import PostImage from "../post/postMedia";
 import { Video } from "expo-av";
 import * as ImagePicker from "expo-image-picker";
 import { Divider } from "react-native-elements";
@@ -122,81 +123,6 @@ const Post = ({ post, navigation }) => {
   );
 };
 
-const PostHeader = ({ post }) => (
-  <View
-    style={{
-      flexDirection: "row",
-      justifyContent: "space-between",
-      margin: 5,
-      alignItems: "center",
-    }}
-  >
-    <View style={{ flexDirection: "row", alignItems: "center" }}>
-      <Image
-        source={{ uri: post.fields.profile_picture }}
-        style={styles.story}
-      />
-      <Text
-        style={{
-          color: GlobalColors.text.postText,
-          marginLeft: 5,
-          fontWeight: "700",
-        }}
-      >
-        {post.fields.username}
-      </Text>
-    </View>
-    <TouchableOpacity>
-      <Text style={{ color: GlobalColors.text.postText, fontWeight: "900" }}>
-        ...
-      </Text>
-    </TouchableOpacity>
-  </View>
-);
-
-const PostImage = ({ post, scrollViewRef, videoInView, setVideoInView }) => {
-  const postImages = post.fields.post_images;
-
-  const handlePlaybackStatusUpdate = (status) => {
-    const { isPlaying, positionMillis, durationMillis } = status;
-    const isVideoInView = isPlaying && positionMillis < durationMillis / 2;
-    setVideoInView(isVideoInView);
-  };
-
-  if (postImages.endsWith(".mp4")) {
-    return (
-      <View
-        style={{
-          width: "100%",
-          height: 450,
-        }}
-      >
-        <Video
-          source={{ uri: postImages }}
-          style={{ height: "100%", resizeMode: "cover" }}
-          shouldPlay={videoInView}
-          useNativeControls
-          onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
-        />
-      </View>
-    );
-  } else {
-    return (
-      <View
-        style={{
-          width: "100%",
-          height: 450,
-        }}
-      >
-        <Image
-          source={{ uri: postImages }}
-          style={{ height: "100%", resizeMode: "cover" }}
-        />
-      </View>
-    ); // Handle other file types or unsupported formats
-  }
-};
-
 const PostFooter = ({ post, user_liked_posts, HandleLike, like, navigation }) => (
   <View style={{ flexDirection: "row" }}>
     <View style={styles.leftFooterIconsContainer}>
@@ -277,14 +203,7 @@ const Comments = ({ post }) => (
 export default Post;
 
 const styles = StyleSheet.create({
-  story: {
-    width: 35,
-    height: 35,
-    borderRadius: 50,
-    marginLeft: 10,
-    borderWidth: 1.5,
-    borderColor: GlobalColors.elements.storyBorderColor,
-  },
+
   footerIcon: {
     width: 25,
     height: 25,
