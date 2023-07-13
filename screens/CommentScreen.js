@@ -18,18 +18,19 @@ import { GlobalColors } from "../constants/GlobalColors";
 import { API } from "../constants/GlobalAPI";
 import { Divider } from "react-native-elements";
 import { useRoute } from "@react-navigation/native";
+import PostReactions from "../components/post/postReactions";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import SkeletonLoader from "../components/commonElements/SkeletonLoader";
+import PostImage from "../components/post/postMedia";
 
 const SERVER_STATE = API.CURRENT_STATE;
 // CommentSectionPage component
 const CommentScreen = ({ navigation }) => {
   const [sortingOption, setSortingOption] = useState("newest");
   const [comments, setComment] = useState([]);
-  const [noCommentsPost, setNoCommentsPost] = useState('');
-  const [commentInput, setCommentInput] = useState('');
-  
+  const [noCommentsPost, setNoCommentsPost] = useState("");
+  const [commentInput, setCommentInput] = useState("");
 
   const { user } = useSelector((state) => state.userReducer);
   const route = useRoute();
@@ -55,11 +56,9 @@ const CommentScreen = ({ navigation }) => {
           },
         });
         setComment(response.data.post.comments);
-        console.log('----comments---', response.data.post)
-        if(response.data.post.comments.length === 0)
-          setNoCommentsPost(true)
-        else
-          setNoCommentsPost(false)
+        console.log("----comments---", response.data.post);
+        if (response.data.post.comments.length === 0) setNoCommentsPost(true);
+        else setNoCommentsPost(false);
       } catch (error) {
         console.log(error);
       }
@@ -75,25 +74,27 @@ const CommentScreen = ({ navigation }) => {
     // setComment(text);
   };
 
-  const handlePostComment =  () => {
+  const handlePostComment = () => {
     Keyboard.dismiss();
     console.log(commentInput.commentInput);
-    if( commentInput.commentInput ){
+    if (commentInput.commentInput) {
       let createUserComment = async () => {
         try {
           let baseUrl = API[SERVER_STATE] + API.POST.comments;
-          console.log(baseUrl)
+          console.log(baseUrl);
           let response = await axios.post(baseUrl, {
             username: user.user_id,
             token: user.token,
             comment: {
-              user_id : user.user_id,
-              post_id : postDetails.pk,
-              text : commentInput.commentInput,
+              user_id: user.user_id,
+              post_id: postDetails.pk,
+              text: commentInput.commentInput,
               tagged_users: "1, 2, 3",
-              comment_image : "https: //www.pngfind.com/pngs/m/39-398349_computer-icons-user-profile-facebook-instagram-instagram-profile.png",
-              comment_video : "https: //www.pngfind.com/pngs/m/39-398349_computer-icons-user-profile-facebook-instagram-instagram-profile.png"
-          }
+              comment_image:
+                "https: //www.pngfind.com/pngs/m/39-398349_computer-icons-user-profile-facebook-instagram-instagram-profile.png",
+              comment_video:
+                "https: //www.pngfind.com/pngs/m/39-398349_computer-icons-user-profile-facebook-instagram-instagram-profile.png",
+            },
           });
         } catch (error) {
           console.log(error);
@@ -101,8 +102,8 @@ const CommentScreen = ({ navigation }) => {
       };
       createUserComment();
     }
-    
-    setCommentInput('');
+
+    setCommentInput("");
     // ...
   };
 
@@ -120,12 +121,49 @@ const CommentScreen = ({ navigation }) => {
         </View>
       </SafeAreaView>
     );
-  } else if(noCommentsPost){
-    <SafeAreaView style={styles.container}>
-      <View style={styles.skeletonContainer}>
-        <Text>There are no comments on this post</Text>
-      </View>
-    </SafeAreaView>
+  } else if (noCommentsPost) {
+    return (
+      <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.keyboardAvoidingView}
+    >
+      <SafeAreaView style={styles.container}>
+        <View style={{ flex: 1 }}>
+          <BackButtonHeader
+            style={styles.backButton}
+            navigation={navigation}
+            color={colorOfBackButton}
+          />
+          <ScrollView style={{ flex: 1, minHeight: "75%" }}>
+            {/* Image or video from the original post */}
+            <View style={styles.postMedia}>
+              <PostImage post={postDetails} />
+            </View>
+            <Text style={styles.noCommentText}>Be the first to comment on this post!</Text>
+
+            {/* Input box for typing a comment */}
+          </ScrollView>
+
+          <View style={styles.commentInputContainer}>
+            <TextInput
+              onChangeText={(commentInput) => setCommentInput({ commentInput })}
+              placeholder="Write a comment..."
+              multiline={true}
+              numberOfLines={3}
+              style={styles.commentInput}
+              value={commentInput}
+            />
+            <TouchableOpacity
+              onPress={handlePostComment}
+              style={styles.postButton}
+            >
+              <Text style={styles.postButtonText}>Post</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
+    );
   }
 
   return (
@@ -143,13 +181,7 @@ const CommentScreen = ({ navigation }) => {
           <ScrollView style={{ flex: 1, minHeight: "75%" }}>
             {/* Image or video from the original post */}
             <View style={styles.postMedia}>
-              <Image
-                source={{
-                  uri:
-                    "https://images.unsplash.com/photo-1541963463532-d68292c34b19?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8Ym9va3xlbnwwfHwwfHx8MA%3D%3D&w=1000&q=80",
-                }}
-                style={styles.postArea}
-              />
+              <PostImage post={postDetails} />
             </View>
 
             {/* Dropdown for comment sorting */}
@@ -166,7 +198,12 @@ const CommentScreen = ({ navigation }) => {
               labelStyle={styles.dropdownLabel}
               onChangeItem={handleSortingChange}
             />
-
+             <View style={styles.postReactionContainer}>
+             <PostReactions
+              post={postDetails}
+              navigation={navigation}
+              style={styles.reactionButtons}
+            /></View> 
             {/* Render comments and replies */}
             {comments.map((commentInstance) => (
               <View>
@@ -189,7 +226,7 @@ const CommentScreen = ({ navigation }) => {
 
           <View style={styles.commentInputContainer}>
             <TextInput
-              onChangeText={(commentInput) => setCommentInput({commentInput})}
+              onChangeText={(commentInput) => setCommentInput({ commentInput })}
               placeholder="Write a comment..."
               multiline={true}
               numberOfLines={3}
@@ -264,7 +301,7 @@ const Comment = ({ comment, icon, user }) => {
     console.log("----No reply,----", comment.fields.replies);
     return <Text></Text>;
   };
-  
+
   return (
     <View style={styles.commentContainer}>
       <View style={styles.replyReactionsContainer}>
@@ -371,6 +408,16 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: "#333333",
   },
+  postReactionContainer: {
+    flex: 1,
+    flexDirection: "row",
+    backgroundColor: GlobalColors.primary.white,
+    maxHeight: 35,
+  },
+  reactionButtons: {
+    flex: 1,
+    alignContent: 'space-between',
+  },
   commentInputContainer: {
     flex: 1,
     flexDirection: "row",
@@ -426,6 +473,14 @@ const styles = StyleSheet.create({
     flex: 1,
     marginRight: 8,
   },
+  noCommentText: {
+    marginLeft: 10,
+    fontSize: 17,
+    color: GlobalColors.text.storyText,
+    flex: 1,
+    marginRight: 8,
+    textAlign: 'center'
+  },
   repliesContainer: {
     width: "100%",
     marginTop: 8,
@@ -437,13 +492,12 @@ const styles = StyleSheet.create({
   replyContainer: {
     padding: 5,
     backgroundColor: GlobalColors.primary.white,
-    flex:1,
-    maxWidth: '90%'
+    flex: 1,
+    maxWidth: "90%",
   },
   replyText: {
     fontSize: 13,
     color: GlobalColors.text.postText,
-    
   },
   LikeButton: {
     height: 20,
