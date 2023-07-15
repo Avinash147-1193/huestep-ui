@@ -71,7 +71,9 @@ const HomeScreen = ({ navigation }) => {
           },
         });
         if (response3.data.post.data.length > 0) {
+          console.log('------------likedPosts,----', response3.data.post.data)
           let user_liked_post_temp = Object.values(response3.data.post.data).map(item => item.fields.post)
+          console.log('------------likedPosts array,----', user_liked_post_temp)
           dispatch(setAuthUserLikedPost(user_liked_post_temp))
         } else {
           dispatch(setAuthUserLikedPost([]))

@@ -1,4 +1,4 @@
-import { SET_AUTH_USER, SET_AUTH_USER_PROFILE, SET_AUTH_USER_POST, SET_AUTH_USER_LIKED_POSTS } from "./actions";
+import { SET_AUTH_USER, SET_AUTH_USER_PROFILE, SET_AUTH_USER_POST, SET_AUTH_USER_LIKED_POSTS, SET_AUTH_USER_LIKE_REACT } from "./actions";
 
 const initialState = {
     user: '',
@@ -17,6 +17,8 @@ function userReducer(state=initialState, action) {
             return {...state, user_post: action.payload};
         case SET_AUTH_USER_LIKED_POSTS:
             return {...state, user_liked_posts: action.payload};
+        case SET_AUTH_USER_LIKE_REACT:
+            return {...state, user_like_post_react: action.payload};
         default:
             return state;
     }

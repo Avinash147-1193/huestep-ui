@@ -31,11 +31,11 @@ const CommentScreen = ({ navigation }) => {
   const [comments, setComment] = useState([]);
   const [noCommentsPost, setNoCommentsPost] = useState("");
   const [commentInput, setCommentInput] = useState("");
-
   const { user } = useSelector((state) => state.userReducer);
   const route = useRoute();
   const { postDetails } = route.params;
-
+  const [likesCount, setLikesCount] = useState(postDetails.fields.likes);
+  console.log("--------printing likes----", postDetails.fields.likes);
   let colorOfBackButton = GlobalColors.buttonColor.backButtonComment;
   let colorOfLikeButton = GlobalColors.buttonColor.commentLike;
   const likeButtonIcon =
@@ -124,45 +124,49 @@ const CommentScreen = ({ navigation }) => {
   } else if (noCommentsPost) {
     return (
       <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={styles.keyboardAvoidingView}
-    >
-      <SafeAreaView style={styles.container}>
-        <View style={{ flex: 1 }}>
-          <BackButtonHeader
-            style={styles.backButton}
-            navigation={navigation}
-            color={colorOfBackButton}
-          />
-          <ScrollView style={{ flex: 1, minHeight: "75%" }}>
-            {/* Image or video from the original post */}
-            <View style={styles.postMedia}>
-              <PostImage post={postDetails} />
-            </View>
-            <Text style={styles.noCommentText}>Be the first to comment on this post!</Text>
-
-            {/* Input box for typing a comment */}
-          </ScrollView>
-
-          <View style={styles.commentInputContainer}>
-            <TextInput
-              onChangeText={(commentInput) => setCommentInput({ commentInput })}
-              placeholder="Write a comment..."
-              multiline={true}
-              numberOfLines={3}
-              style={styles.commentInput}
-              value={commentInput}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.keyboardAvoidingView}
+      >
+        <SafeAreaView style={styles.container}>
+          <View style={{ flex: 1 }}>
+            <BackButtonHeader
+              style={styles.backButton}
+              navigation={navigation}
+              color={colorOfBackButton}
             />
-            <TouchableOpacity
-              onPress={handlePostComment}
-              style={styles.postButton}
-            >
-              <Text style={styles.postButtonText}>Post</Text>
-            </TouchableOpacity>
+            <ScrollView style={{ flex: 1, minHeight: "75%" }}>
+              {/* Image or video from the original post */}
+              <View style={styles.postMedia}>
+                <PostImage post={postDetails} />
+              </View>
+              <Text style={styles.noCommentText}>
+                Be the first to comment on this post!
+              </Text>
+
+              {/* Input box for typing a comment */}
+            </ScrollView>
+
+            <View style={styles.commentInputContainer}>
+              <TextInput
+                onChangeText={(commentInput) =>
+                  setCommentInput({ commentInput })
+                }
+                placeholder="Write a comment..."
+                multiline={true}
+                numberOfLines={3}
+                style={styles.commentInput}
+                value={commentInput}
+              />
+              <TouchableOpacity
+                onPress={handlePostComment}
+                style={styles.postButton}
+              >
+                <Text style={styles.postButtonText}>Post</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </SafeAreaView>
-    </KeyboardAvoidingView>
+        </SafeAreaView>
+      </KeyboardAvoidingView>
     );
   }
 
@@ -198,12 +202,15 @@ const CommentScreen = ({ navigation }) => {
               labelStyle={styles.dropdownLabel}
               onChangeItem={handleSortingChange}
             />
-             <View style={styles.postReactionContainer}>
-             <PostReactions
-              post={postDetails}
-              navigation={navigation}
-              style={styles.reactionButtons}
-            /></View> 
+            <View style={styles.postReactionContainer}>
+              <PostReactions
+                post={postDetails}
+                navigation={navigation}
+                setLikesCount={setLikesCount}
+                likesCount={likesCount}
+                style={styles.reactionButtons}
+              />
+            </View>
             {/* Render comments and replies */}
             {comments.map((commentInstance) => (
               <View>
@@ -416,7 +423,7 @@ const styles = StyleSheet.create({
   },
   reactionButtons: {
     flex: 1,
-    alignContent: 'space-between',
+    alignContent: "space-between",
   },
   commentInputContainer: {
     flex: 1,
@@ -479,7 +486,7 @@ const styles = StyleSheet.create({
     color: GlobalColors.text.storyText,
     flex: 1,
     marginRight: 8,
-    textAlign: 'center'
+    textAlign: "center",
   },
   repliesContainer: {
     width: "100%",

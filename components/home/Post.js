@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import {
   StyleSheet,
   Text,
@@ -12,18 +12,12 @@ import PostImage from "../post/postMedia";
 import PostReactions from "../post/postReactions";
 import { Divider } from "react-native-elements";
 import { GlobalColors } from "../../constants/GlobalColors";
-import { API } from "../../constants/GlobalAPI";
 import { POSTS } from "../../data/Posts";
-import axios from "axios";
-import { useSelector } from "react-redux";
-
-const SERVER_STATE = API.CURRENT_STATE;
 
 const Post = ({ post, navigation }) => {
-  
-  const { user_liked_posts, user } = useSelector((state) => state.userReducer);
   const scrollViewRef = useRef(null);
   const [videoInView, setVideoInView] = useState(false);
+  const [likesCount, setLikesCount] = useState(post.fields.likes);
 
   const handleScroll = (event) => {
     const scrollPosition = event.nativeEvent.contentOffset.y;
@@ -52,8 +46,10 @@ const Post = ({ post, navigation }) => {
           <PostReactions
             post={post}
             navigation={navigation}
+            setLikesCount={setLikesCount}
+            likesCount={likesCount}
           />
-          {/* <Likes post={post} likesCount={likesCount} /> */}
+          <Likes post={post} likesCount={likesCount} />
           <Caption post={post} />
           <CommentSection post={post} />
           <Comments post={post} />

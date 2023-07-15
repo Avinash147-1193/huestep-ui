@@ -1,8 +1,9 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { View, StyleSheet, TouchableOpacity, Image } from "react-native";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { API } from "../../constants/GlobalAPI";
 import axios from "axios";
+import { setAuthUserLikedPost } from "../../redux/actions";
 const SERVER_STATE = API.CURRENT_STATE;
 
 const postFooterIcons = [
@@ -27,13 +28,11 @@ const postFooterIcons = [
 
 // user_liked_posts is available in redux, have to import it to pass it from component.
 
-const PostReactions = ({ post, navigation }) => {
+const PostReactions = ({ post, navigation, setLikesCount, likesCount }) => {
   const { user_liked_posts, user } = useSelector((state) => state.userReducer);
   const [like, setLike] = useState("");
-  const [likesCount, setLikesCount] = useState("");
-
+  const dispatch = useDispatch();
   useEffect(() => {
-    setLikesCount(post.fields.likes);
     if (user_liked_posts.indexOf(post.pk) >= 0) {
       setLike(1);
     } else {
@@ -43,6 +42,18 @@ const PostReactions = ({ post, navigation }) => {
 
   const HandleLike = (post) => {
     like == 0 ? setLikesCount(likesCount + 1) : setLikesCount(likesCount - 1);
+
+    if (like == 0) {
+      let temp = user_liked_posts.slice();
+      temp.push(post.pk);
+      dispatch(setAuthUserLikedPost(temp));
+    } else {
+      let temp = user_liked_posts.slice();
+      const index = temp.indexOf(post.pk);
+      temp.splice(index, 1);
+      // temp = temp.remove(post.pk)
+      dispatch(setAuthUserLikedPost(temp));
+    }
     setLike(!like);
 
     try {
@@ -52,6 +63,7 @@ const PostReactions = ({ post, navigation }) => {
         token: user.token,
         post: { post_id: post.pk },
       });
+      console.log(`hit url: ${baseUrl} response received: ${response}`);
     } catch (error) {
       console.log(error);
     }
@@ -98,8 +110,6 @@ const Icon = ({ imageStyle, imgUrl, onPress }) => (
     <Image style={imageStyle} source={{ uri: imgUrl }} />
   </TouchableOpacity>
 );
-
-
 
 export default PostReactions;
 
