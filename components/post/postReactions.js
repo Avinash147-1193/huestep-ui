@@ -27,6 +27,7 @@ const postFooterIcons = [
 ];
 
 // user_liked_posts is available in redux, have to import it to pass it from component.
+/* declare a state variable setLikesCount in the parent componenet and pass it to this componenet */
 
 const PostReactions = ({ post, navigation, setLikesCount, likesCount }) => {
   const { user_liked_posts, user } = useSelector((state) => state.userReducer);
