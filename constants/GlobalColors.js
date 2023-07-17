@@ -14,6 +14,7 @@ export const GlobalColors = {
     text: {
         postText: 'black',
         storyText: 'white',
+        viewMoreButton: '#383838',
     },
     buttonColor: {
         comment : '4a807d',

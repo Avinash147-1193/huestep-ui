@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useLayoutEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -23,6 +23,8 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import SkeletonLoader from "../components/commonElements/SkeletonLoader";
 import PostImage from "../components/post/postMedia";
+import moment from 'moment';
+
 
 const SERVER_STATE = API.CURRENT_STATE;
 
@@ -52,6 +54,9 @@ const CommentScreen = ({ navigation }) => {
     "https://img.icons8.com/ios/50/" +
     colorOfLikeButton +
     "/facebook-like--v1.png";
+  const inputRef = useRef(null);
+
+  
 
     const likeButtonIconInActive = "https://img.icons8.com/ios-filled/50/facebook-like.png";
 
@@ -80,10 +85,6 @@ const CommentScreen = ({ navigation }) => {
 
   const handleSortingChange = (item) => {
     setSortingOption(item.value);
-  };
-
-  const handleCommentChange = (text) => {
-    // setComment(text);
   };
 
   const handlePostComment = async () => {
@@ -122,12 +123,7 @@ const CommentScreen = ({ navigation }) => {
 
     setCommentInput("");
   };
-
-  const handleGoBack = () => {
-    // Logic to navigate back
-    // ...
-  };
-
+  
   if (comments.length === 0 && !noCommentsPost) {
     return (
       <SafeAreaView style={styles.container}>
@@ -242,6 +238,7 @@ const CommentScreen = ({ navigation }) => {
                   icon={likeButtonIconActive}
                   iconInactive={likeButtonIconInActive}
                   user={user}
+                  inputRef={inputRef}
                 />
                 <Divider
                   width={1}
@@ -256,6 +253,7 @@ const CommentScreen = ({ navigation }) => {
 
           <View style={styles.commentInputContainer}>
             <TextInput
+              ref={inputRef}
               onChangeText={(commentInput) =>
                 setCommentInput({ commentInput })
               }
@@ -279,13 +277,27 @@ const CommentScreen = ({ navigation }) => {
 };
 
 // Comment component
-const Comment = ({ comment, icon, iconInactive, user }) => {
+const Comment = ({ comment, icon, iconInactive, user, inputRef }) => {
   console.log("----main---", comment.fields.replies);
   const [showReplies, setShowReplies] = useState(false);
   const [replies, setReplies] = useState([]);
   const [fetchedReplies, setFetchedReplies] = useState([]);
   const [commentLiked, setCommentLiked] = useState(false);
   const [commentLikesCount, setCommentLikesCount] = useState(comment.fields.likes);
+  const [showFullComment, setShowFullComment] = useState(false);
+  const commentText = comment.fields.text;
+  const truncatedComment = commentText.substring(0, 60);
+  const isCommentLong = commentText.length > 60;
+
+  let current = new Date().toISOString().slice(0, 19);
+
+  const toggleCommentText = () => {
+    setShowFullComment(!showFullComment);
+  };
+
+  const handleButtonClick = () => {
+    inputRef.current.focus();
+  };
 
   const toggleReplies = async () => {
     if (!fetchedReplies.includes(comment.pk)) {
@@ -345,7 +357,20 @@ const Comment = ({ comment, icon, iconInactive, user }) => {
           }}
           style={styles.story}
         />
-        <Text style={styles.commentText}>{comment.fields.text}</Text>
+        <Text style={styles.commentText}>
+          {showFullComment ? commentText : truncatedComment}
+          {isCommentLong && (
+            <Text
+              style={styles.viewMoreButton}
+              onPress={toggleCommentText}
+            >
+              {showFullComment ? " View Less" : "... View More"}
+            </Text>
+          )}
+        </Text>
+        <Text style={styles.createdAtText}>
+          {moment(comment.fields.created_at).fromNow()}
+        </Text>
       </View>
 
       {/* Render likes and reply button */}
@@ -362,7 +387,7 @@ const Comment = ({ comment, icon, iconInactive, user }) => {
         <TouchableOpacity onPress={toggleReplies} style={styles.actionButton}>
           {comment.fields.replies > 0 ? <ReplyToggleView /> : <NoReplyView />}
         </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity style={styles.actionButton} onPress={handleButtonClick}>
           <Text style={styles.actionButtonText}>Reply to comment</Text>
         </TouchableOpacity>
       </View>
@@ -408,7 +433,7 @@ const Reply = ({ reply, icon, iconInactive }) => {
           onPress={() => handleReply(reply)}
           style={styles.actionButton}
         >
-          <Text style={styles.actionButtonText}>Reply to comment</Text>
+          <Text style={styles.actionButtonText}>Reply</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -536,6 +561,12 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: GlobalColors.text.postText,
   },
+  createdAtText: {
+    fontSize: 10,
+    marginBottom: 8,
+    color: GlobalColors.text.postText,
+    flexWrap: "wrap",
+  },
   LikeButton: {
     height: 20,
     width: 20,
@@ -570,6 +601,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  viewMoreButton: {
+    color: GlobalColors.text.viewMoreButton,
   },
 });
 
