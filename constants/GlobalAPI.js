@@ -10,6 +10,7 @@ export const API = {
     },
     POST: {
         comments : 'post/comment/',
-        replysOnComment : 'post/reply/',
+        replysOnComment : 'post/reply/', 
+        reply: 'post/reply/',
     },
 }

@@ -23,25 +23,33 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import SkeletonLoader from "../components/commonElements/SkeletonLoader";
 import PostImage from "../components/post/postMedia";
-import moment from 'moment';
-
+import moment from "moment";
 
 const SERVER_STATE = API.CURRENT_STATE;
 
-const handleLike = (comment, type, handler, stateVariable, likesCount, setLikesCountHandler) => {
-    if(stateVariable){
-      setLikesCountHandler(likesCount - 1)
-    } else{
-      setLikesCountHandler(likesCount + 1)
-    }
-     handler(!stateVariable)
-}
+const handleLike = (
+  comment,
+  type,
+  handler,
+  stateVariable,
+  likesCount,
+  setLikesCountHandler
+) => {
+  if (stateVariable) {
+    setLikesCountHandler(likesCount - 1);
+  } else {
+    setLikesCountHandler(likesCount + 1);
+  }
+  handler(!stateVariable);
+};
 
 const CommentScreen = ({ navigation }) => {
   const [sortingOption, setSortingOption] = useState("newest");
   const [comments, setComments] = useState([]);
   const [noCommentsPost, setNoCommentsPost] = useState("");
   const [commentInput, setCommentInput] = useState("");
+  const [commentTemp, setCommentTemp] = useState([]);
+  const [isReplyPost, setIsReplyPost] = useState("comment");
   const { user } = useSelector((state) => state.userReducer);
   const route = useRoute();
   const { postDetails } = route.params;
@@ -56,28 +64,27 @@ const CommentScreen = ({ navigation }) => {
     "/facebook-like--v1.png";
   const inputRef = useRef(null);
 
-  
+  const likeButtonIconInActive =
+    "https://img.icons8.com/ios-filled/50/facebook-like.png";
 
-    const likeButtonIconInActive = "https://img.icons8.com/ios-filled/50/facebook-like.png";
-
-    const fetchCommentsOnPost = async () => {
-      try {
-        let baseUrl = API[SERVER_STATE] + API.POST.comments;
-        let response = await axios.get(baseUrl, {
-          params: {
-            username: user.user_id,
-            token: user.token,
-            post: {},
-            post_id: postDetails.pk,
-          },
-        });
-        setComments(response.data.post.comments);
-        if (response.data.post.comments.length === 0) setNoCommentsPost(true);
-        else setNoCommentsPost(false);
-      } catch (error) {
-        console.log(error);
-      }
-    };
+  const fetchCommentsOnPost = async () => {
+    try {
+      let baseUrl = API[SERVER_STATE] + API.POST.comments;
+      let response = await axios.get(baseUrl, {
+        params: {
+          username: user.user_id,
+          token: user.token,
+          post: {},
+          post_id: postDetails.pk,
+        },
+      });
+      setComments(response.data.post.comments);
+      if (response.data.post.comments.length === 0) setNoCommentsPost(true);
+      else setNoCommentsPost(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
     fetchCommentsOnPost();
@@ -87,10 +94,17 @@ const CommentScreen = ({ navigation }) => {
     setSortingOption(item.value);
   };
 
+  const handleReplyButtonClick = (comment) => {
+    setIsReplyPost("reply")
+    setCommentTemp(comment)
+    console.log('------comments in reply, ',comment)
+    inputRef.current.focus();
+  };
+
   const handlePostComment = async () => {
     Keyboard.dismiss();
     console.log(commentInput.commentInput);
-    if (commentInput.commentInput) {
+    if (commentInput.commentInput && isReplyPost == "comment") {
       try {
         let baseUrl = API[SERVER_STATE] + API.POST.comments;
         console.log(baseUrl);
@@ -115,7 +129,36 @@ const CommentScreen = ({ navigation }) => {
           scrollViewRef.current.scrollToEnd({ animated: true });
         }, 150);
         // Scroll to the end of the comment section
-       
+      } catch (error) {
+        console.log(error);
+      }
+    }
+    if (commentInput.commentInput && isReplyPost == "reply") {
+      try {
+        let baseUrl = API[SERVER_STATE] + API.POST.reply;
+        console.log(baseUrl);
+        console.log('----commentTemp---', commentTemp)
+        await axios.post(baseUrl, {
+          username: user.user_id,
+          token: user.token,
+          reply: {
+            post_id: postDetails.pk,
+            text: commentInput.commentInput,
+            comment_id: commentTemp.pk,
+            tagged_users: "1, 2, 3",
+            reply_image:
+              "https://www.pngfind.com/pngs/m/39-398349_computer-icons-user-profile-facebook-instagram-instagram-profile.png",
+            reply_video:
+              "https://www.pngfind.com/pngs/m/39-398349_computer-icons-user-profile-facebook-instagram-instagram-profile.png",
+          },
+        });
+
+        fetchCommentsOnPost();
+        setIsReplyPost("comment")
+        setTimeout(() => {
+          scrollViewRef.current.scrollToEnd({ animated: true });
+        }, 150);
+        // Scroll to the end of the comment section
       } catch (error) {
         console.log(error);
       }
@@ -123,7 +166,7 @@ const CommentScreen = ({ navigation }) => {
 
     setCommentInput("");
   };
-  
+
   if (comments.length === 0 && !noCommentsPost) {
     return (
       <SafeAreaView style={styles.container}>
@@ -197,10 +240,7 @@ const CommentScreen = ({ navigation }) => {
             navigation={navigation}
             color={colorOfBackButton}
           />
-          <ScrollView
-            ref={scrollViewRef}
-            style={{ flex: 1, minHeight: "75%" }}
-          >
+          <ScrollView ref={scrollViewRef} style={{ flex: 1, minHeight: "75%" }}>
             {/* Image or video from the original post */}
             <View style={styles.postMedia}>
               <PostImage post={postDetails} />
@@ -239,6 +279,7 @@ const CommentScreen = ({ navigation }) => {
                   iconInactive={likeButtonIconInActive}
                   user={user}
                   inputRef={inputRef}
+                  handleReplyButtonClick={handleReplyButtonClick}
                 />
                 <Divider
                   width={1}
@@ -254,9 +295,7 @@ const CommentScreen = ({ navigation }) => {
           <View style={styles.commentInputContainer}>
             <TextInput
               ref={inputRef}
-              onChangeText={(commentInput) =>
-                setCommentInput({ commentInput })
-              }
+              onChangeText={(commentInput) => setCommentInput({ commentInput })}
               placeholder="Write a comment..."
               multiline={true}
               numberOfLines={3}
@@ -277,26 +316,21 @@ const CommentScreen = ({ navigation }) => {
 };
 
 // Comment component
-const Comment = ({ comment, icon, iconInactive, user, inputRef }) => {
-  console.log("----main---", comment.fields.replies);
+const Comment = ({ comment, icon, iconInactive, user, inputRef, handleReplyButtonClick }) => {
   const [showReplies, setShowReplies] = useState(false);
   const [replies, setReplies] = useState([]);
   const [fetchedReplies, setFetchedReplies] = useState([]);
   const [commentLiked, setCommentLiked] = useState(false);
-  const [commentLikesCount, setCommentLikesCount] = useState(comment.fields.likes);
+  const [commentLikesCount, setCommentLikesCount] = useState(
+    comment.fields.likes
+  );
   const [showFullComment, setShowFullComment] = useState(false);
   const commentText = comment.fields.text;
   const truncatedComment = commentText.substring(0, 60);
   const isCommentLong = commentText.length > 60;
 
-  let current = new Date().toISOString().slice(0, 19);
-
   const toggleCommentText = () => {
     setShowFullComment(!showFullComment);
-  };
-
-  const handleButtonClick = () => {
-    inputRef.current.focus();
   };
 
   const toggleReplies = async () => {
@@ -320,7 +354,6 @@ const Comment = ({ comment, icon, iconInactive, user, inputRef }) => {
               comment_id: comment.pk,
             },
           });
-          console.log("----replies loading----", response.data.replies.data);
           setReplies(response.data.replies.data, ...replies);
         } catch (error) {
           console.log("---error", error);
@@ -344,7 +377,6 @@ const Comment = ({ comment, icon, iconInactive, user, inputRef }) => {
   };
 
   const NoReplyView = () => {
-    console.log("----No reply,----", comment.fields.replies);
     return <Text></Text>;
   };
 
@@ -360,10 +392,7 @@ const Comment = ({ comment, icon, iconInactive, user, inputRef }) => {
         <Text style={styles.commentText}>
           {showFullComment ? commentText : truncatedComment}
           {isCommentLong && (
-            <Text
-              style={styles.viewMoreButton}
-              onPress={toggleCommentText}
-            >
+            <Text style={styles.viewMoreButton} onPress={toggleCommentText}>
               {showFullComment ? " View Less" : "... View More"}
             </Text>
           )}
@@ -378,16 +407,31 @@ const Comment = ({ comment, icon, iconInactive, user, inputRef }) => {
       <View style={styles.replyReactionsContainer}>
         <Text>{commentLikesCount} Likes</Text>
         <TouchableOpacity
-          onPress={() => handleLike(comment, "comment", setCommentLiked, commentLiked, commentLikesCount, setCommentLikesCount)}
+          onPress={() =>
+            handleLike(
+              comment,
+              "comment",
+              setCommentLiked,
+              commentLiked,
+              commentLikesCount,
+              setCommentLikesCount
+            )
+          }
           style={styles.actionButton}
         >
-          <Image source={{ uri: commentLiked ? iconInactive : icon  }} style={styles.LikeButton} />
+          <Image
+            source={{ uri: commentLiked ? iconInactive : icon }}
+            style={styles.LikeButton}
+          />
         </TouchableOpacity>
 
         <TouchableOpacity onPress={toggleReplies} style={styles.actionButton}>
           {comment.fields.replies > 0 ? <ReplyToggleView /> : <NoReplyView />}
         </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton} onPress={handleButtonClick}>
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={() => handleReplyButtonClick(comment)}
+        >
           <Text style={styles.actionButtonText}>Reply to comment</Text>
         </TouchableOpacity>
       </View>
@@ -395,7 +439,12 @@ const Comment = ({ comment, icon, iconInactive, user, inputRef }) => {
       {showReplies && (
         <View style={styles.repliesContainer}>
           {replies.map((reply) => (
-            <Reply key={reply.pk} reply={reply.fields} icon={icon} iconInactive={iconInactive}/>
+            <Reply
+              key={reply.pk}
+              reply={reply.fields}
+              icon={icon}
+              iconInactive={iconInactive}
+            />
           ))}
         </View>
       )}
@@ -424,10 +473,22 @@ const Reply = ({ reply, icon, iconInactive }) => {
       <View style={styles.replyReactionsContainer}>
         <Text style={styles.actionButton}>{replyLikesCount} likes</Text>
         <TouchableOpacity
-          onPress={() => handleLike(reply, "reply", setReplyLiked, replyLiked, replyLikesCount, setReplyLikesCount)}
+          onPress={() =>
+            handleLike(
+              reply,
+              "reply",
+              setReplyLiked,
+              replyLiked,
+              replyLikesCount,
+              setReplyLikesCount
+            )
+          }
           style={styles.actionButton}
         >
-          <Image source={{ uri: replyLiked ? iconInactive : icon }} style={styles.LikeButton} />
+          <Image
+            source={{ uri: replyLiked ? iconInactive : icon }}
+            style={styles.LikeButton}
+          />
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => handleReply(reply)}
@@ -595,7 +656,7 @@ const styles = StyleSheet.create({
   },
   keyboardAvoidingView: {
     flex: 1,
-    width:'100%'
+    width: "100%",
   },
   skeletonContainer: {
     flex: 1,
